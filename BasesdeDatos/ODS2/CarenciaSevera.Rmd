@@ -1,1 +1,195 @@
+---
+title: "Estudio del indicador de Privación Material Severa (AROPE) en las Comarcas de la Comunitat Valenciana y de su correlación con la Tasa de Pobreza Severa (INE)"
+author: "Stefano Sanfilippo"
+date: "2024-02-07"
+output: html_document
+---
 
+```{r include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+```
+
+```{r}
+
+library(dplyr)
+library(flextable)
+set_flextable_defaults(font.family = "Arial",
+                       font.size = 10,
+                       border.color = "dodgerblue3",
+                       background.color = "aliceblue")
+
+library(ggplot2)
+```
+
+### Objetivo
+
+La finalidad de este análisis es la de verificar la **correlación** existente ente Tasa de Pobreza Severa, que el Instituto Nacional de Estadística (INE) recoge de datos del Ministerio de Hacienda y publica en sus bases de datos municipales, y la Tasa de Privación Material Severa (AROPE), que el INE publica por CCAA y que el IVE estima en su [Web](https://pegv.gva.es/es/indicadores-de-pobreza-y-condiciones-de-vida-a-nivel-subregional).
+
+La **intención** es verificar la existencia de dicha correlación para, en caso positivo, poder **inferir  indirectamente la Tasa de Privación Severa (AROPE) para los municipios valencianos, a partir de los datos municipales sobre Pobreza Severa.**
+
+### Advertencia
+
+Si el IVE no ha realizado directamente esta inferencia, es señal que en cualquier caso se trata de una operación que implica cierto nivel indefinición que, en su caso, necesitará de la debida prudencia para ser llevada a cabo. 
+
+
+### Cálculo de la pobreza severa comarcal
+
+Hemos calculado los valores medios comarcales a del indicaador de Pobreza Severa por Municipios, facilitado por el INE: hemor realizado la media de los valores municipales ponderando por población de cada municipio (los municipios que no aparecen en los datos INE no ponderan).
+
+Dichos valores se incluyen en una tabla que contiene los valores estimados por el Instituto Valenciano de Estadística para la Tasa de Privación Extrema.
+
+```{r}
+
+municipios <- 
+    readxl::read_xlsx(
+        "C:/DataPortatil/Estudis/CreuRojaVal/ODS/instrumentosYbbdd/BasesdeDatos/Demografia/municipios.xlsx")
+
+pobAlacant <-
+    readxl::read_xls(
+        "C:/DataPortatil/Estudis/CreuRojaVal/ODS/instrumentosYbbdd/BasesdeDatos/ODS1/30838_PobrezaAlacant.xls",
+        skip = 9,
+        col_names = FALSE) |> 
+    rename(Municipio= ...1,
+           Pobreza.Severa= ...2,
+           Riesgo.PObreza=...3) |> 
+    mutate(ine= stringr::str_sub(Municipio,1, 5),
+           Municipio= stringr::str_sub(Municipio,7,100),
+           Pobreza.Severa= as.numeric(Pobreza.Severa),
+           Riesgo.PObreza= as.numeric(Riesgo.PObreza)) |> 
+    select(4,1,2,3)
+
+pobCastellon <-
+    readxl::read_xls(
+        "C:/DataPortatil/Estudis/CreuRojaVal/ODS/instrumentosYbbdd/BasesdeDatos/ODS1/30967_PobrezaCastellon.xls",
+        skip = 9,
+        col_names = FALSE) |> 
+    rename(Municipio= ...1,
+           Pobreza.Severa= ...2,
+           Riesgo.PObreza=...3) |> 
+    mutate(ine= stringr::str_sub(Municipio,1, 5),
+           Municipio= stringr::str_sub(Municipio,7,100),
+           Pobreza.Severa= as.numeric(Pobreza.Severa),
+           Riesgo.PObreza= as.numeric(Riesgo.PObreza)) |> 
+    select(4,1,2,3)
+
+pobValencia <-
+    readxl::read_xls(
+        "C:/DataPortatil/Estudis/CreuRojaVal/ODS/instrumentosYbbdd/BasesdeDatos/ODS1/31255_PobrezaValencia.xls",
+        skip = 9,
+        col_names = FALSE) |> 
+    rename(Municipio= ...1,
+           Pobreza.Severa= ...2,
+           Riesgo.PObreza=...3) |> 
+    mutate(ine= stringr::str_sub(Municipio,1, 5),
+           Municipio= stringr::str_sub(Municipio,7,100),
+           Pobreza.Severa= as.numeric(Pobreza.Severa),
+           Riesgo.PObreza= as.numeric(Riesgo.PObreza)) |> 
+    select(4,1,2,3)
+
+pobMun <- rbind(pobAlacant,pobCastellon,pobValencia)
+
+pobrSev <- municipios[ ,c(1,3,4)] |> inner_join(pobMun[, c(1,3,4)], by= "ine")
+
+comarcas <- 
+    readxl::read_xlsx(
+        "C:/DataPortatil/Estudis/CreuRojaVal/ODS/instrumentosYbbdd/BasesdeDatos/Demografia/comarcasVal.xlsx")
+
+pobrSevCom <- pobrSev |> 
+    inner_join(comarcas[ , c(1,3,4)], by="ine") |> 
+    group_by(codCom,Comarca) |> 
+    filter(!is.na(Pobreza.Severa)) |> 
+    mutate(pobCom= sum(Total)) |> 
+    summarise(media = weighted.mean(Pobreza.Severa, Total), 
+              media.Riesgo= weighted.mean(Riesgo.PObreza, Total))
+
+
+
+
+```
+
+
+
+
+```{r}
+
+tasaPriv <- readxl::read_xlsx("PrivacionSev_V0025_C2D0022.xlsx",
+                  skip = 11,
+                  col_names = FALSE) |> rename(Comarca= ...1,
+                                       TasaPriv= ...2)
+quadre <- pobrSevCom |> inner_join(tasaPriv, by= "Comarca")
+
+# writexl::write_xlsx(quadre, "CarenciaSevera.xlsx")
+
+quadre |> 
+    mutate(codCom= as.integer(codCom),
+           media= round(media,2),
+           media.Riesgo= round(media.Riesgo,2)) |> 
+    arrange(codCom) |> 
+    flextable() |> 
+    set_header_labels(codCom= "Código",Comarca= "Comarca", 
+                      media= "Tasa Pobreza Severa (INE)", 
+                      media.Riesgo= "Tasa Riesgo Pobreza (INE)",
+                      TasaPriv= "Tasa Privación Severa (AROPE)") |> 
+    width(width = 1.5)
+
+
+
+```
+
+\
+
+### Visualización de los valores en el diagrama de dispersión y regresión linear
+
+El gráfico manifiesta una cierta homogeneidad de distribución de valores alrededor de la recta de regresión. Lo que indica una cierta correlación lineal.
+
+
+```{r}
+library(plotly)
+
+p <- quadre |> 
+    ggplot(aes(x=media,
+               y=TasaPriv,
+               text= paste0(Comarca,
+                            "\nTassa de Pobreza Severa (INE): ", round(media,2),
+                            "\nTasa de Privación Severa (AROPE): ", round(TasaPriv,2)))) +
+    geom_point() +
+    geom_smooth(inherit.aes = FALSE, aes(x= media,y= TasaPriv), method = "lm", formula = y~x, se= FALSE) +
+    xlab("Tasa de Pobreza Severa Comarcal (estimación INE)")+
+    ylab("Tasa de Privación Severa Comarcal (estimación AROPE)") +
+    ggtitle("Relación Pobreza Severa (INE) versus Privación Material Severa (AROPE)")
+
+ggplotly(p, tooltip = "text")
+
+
+```
+
+
+
+
+### Test de correlación
+
+```{r}
+
+correl <- cor.test(quadre$media, quadre$TasaPriv, method = "pearson")
+
+```
+
+El test de correlación de *Pearson* ($\rho=\frac{Cov(X,Y)}{\sigma_x\sigma_y}$) pone de manifiesto que sí, existe correlción entre ambas variables con un **p-value = `r prettyNum(correl[[3]], scientific= FALSE, digits= 2)`**, i un **Coeficiente de Correlación de `r prettyNum(correl[[4]], scientific= FALSE, digits= 4)`**. 
+
+Un coeficiente de correlación de 0,75 indica una **correlación fuerte** entre las dos variables. En general, el coeficiente de correlación de Pearson varía de -1 a 1, donde -1 representa una correlación negativa perfecta, 1 representa una correlación positiva perfecta y 0 representa la ausencia de correlación.
+
+Un valor de 0,75 sugiere que hay una **relación positiva fuerte entre las dos variables**: cuando una variable aumenta, la otra tiende a aumentar también, y viceversa. En términos de fuerza de correlación, se considera comúnmente:
+
+0 a 0.3: Correlación débil.
+0.3 a 0.7: Correlación moderada.
+0.7 a 1: Correlación fuerte.
+
+Dado que el coeficiente de correlación es 0,75, se clasificaría como una correlación fuerte.
+
+El **p-value** asociado al coeficiente de correlación indica la probabilidad de observar una correlación tan fuerte (o más fuerte) por pura casualidad. Un p-value muy bajo, como el que hemos obtenido (0.00000046), sugiere que **la correlación observada es estadísticamente significativa** y no se debe simplemente al azar.
+
+Finalmente, el coeficiente de determinación $R^2$ es de `r prettyNum(cor.test(quadre$media, quadre$TasaPriv)[[4]]^2, digits=3)`. Lo que nos indica una correlación suficientemente ajustada al modelo lineal.
+
+Rerumiendo, **podemos considerar inferir valores de una tercera variable ligada a ambas, ya que estos indicadores sugieren que hay una asociación sustancial entre las dos variables que estamos considerando en el modelo.**
