@@ -1,0 +1,127 @@
+---
+title: "<img src=\"CR-ES-Horizontal-CMYK_page-164-53.jpg\" style=\"vertical-align: top; width:50%; height: auto; \"/> <br> <br> <br> <br> <br> Catálogo de fuentes de datos para la elaboración de los indicadores municipales sobre ODS en la CVA"
+output:
+  prettydoc::html_pretty:
+    theme: leonids
+---
+<style>
+.cover{
+    background-color: white;
+    }
+    
+.cover-card .author_name {
+    color: #c42027;
+    font-weight: bolder;
+    font-size: 1.8em;
+    
+}
+</style>
+
+```{r include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(cache = FALSE)
+```
+
+<h3><b>Mapas de municipios y provincias</b></h3>
+- [Limites administrativos municipios CVA](https://dadesobertes.gva.es/dataset/7928cfb8-88f7-4055-98e2-a40f9c8316a8/resource/47078a02-1cc4-4a34-ae39-f4978b21c228/download/ca_municipios_20240305.zip)
+- [Límites administrativos provincias](https://public.opendatasoft.com/explore/?sort=modified){target="_blank"}
+
+<h3><b>Datos de población</b></h3>
+- [IVE - Banco de datos territorial: Padrón general años 1996-2024](https://bdt.gva.es/bdt/res_optimo_static.php?cons=C1V4873&idioma=cas&form=xls){target="_blank"}
+- [INE: Padrón 2022 por edades - Año a año - Alicante/Alacant](https://www.ine.es/jaxiT3/Tabla.htm?t=33591&L=0){target="_blank"}
+- [INE: Padrón 2022 por edades - Año a año - Castellón/Castelló](https://www.ine.es/jaxiT3/Tabla.htm?t=33757&L=0){target="_blank"}
+- [INE: Padrón 2022 por edades - Año a año - Valencia/Valéncia](https://www.ine.es/jaxiT3/Tabla.htm?t=33949&L=0){target="_blank"}
+- [INE: Censo de población por edades, año a año, 2023 y 2024](https://www.ine.es/dynt3/inebase/index.htm?padre=10607&capsel=10607){target="_blank"}
+- [Códigos municipales y correspondencias comarcales](https://pegv.gva.es/es/comarques){target="_blank"}. Hay que recopilar.
+
+
+<h3><b>Datos ODS 1</b></h3>
+- [Tasa de Riesgo de Pobreza y Tasa de Pobreza Severa: Alicante/Alacant: INE - Atlas de distribución de renta de los hogares](https://www.ine.es/jaxiT3/Tabla.htm?t=30838&L=0){target="_blank"}
+- [Tasa de Riesgo de Pobreza y Tasa de Pobreza Severa: Castellón/Castelló - Atlas de distribución de renta de los hogares ](https://www.ine.es/jaxiT3/Tabla.htm?t=30967&L=0){target="_blank"}
+- [Tasa de Riesgo de Pobreza y Tasa de Pobreza Severa: Valencia/Valéncia - Atlas de distribución de renta de los hogares](https://www.ine.es/jaxiT3/Tabla.htm?t=31255&L=0){target="_blank"}
+
+1. Para **Población en riesgo de pobreza** seleccionar *Población con ingresos inferiores al 60% de la mediana*.
+2. Para **Población en pobreza severa** seleccionar *Población con ingresos inferiores al 40% de la mediana*
+
+- [Tasa de Pobreza Infantil Severa: Alicante/Alacant: INE - Atlas de distribución de renta de los hogares](https://www.ine.es/jaxiT3/Tabla.htm?t=30839&L=0){target="_blank"}
+- [Tasa de Pobreza Infantil Severa: Castellón/Castelló - Atlas de distribución de renta de los hogares ](https://www.ine.es/jaxiT3/Tabla.htm?t=30968&L=0){target="_blank"}
+- [Tasa de Pobreza Infantil Severa: Valencia/Valéncia - Atlas de distribución de renta de los hogares](https://www.ine.es/jaxiT3/Tabla.htm?t=31255&L=0){target="_blank"}
+
+Seleccionar *Población con ingresos inferiores al 40% de la mediana* y Tramos de edad: *Menos de 18 años*.
+
+- [Tasa de gasto en Servicios sociales y promoción social: CONPREL: CONSULTA PRESUPUESTOS Y LIQUIDACIONES DE EELL](https://serviciostelematicosext.hacienda.gob.es/SGFAL/CONPREL){target="_blank"}
+Seleccionar Ejercicio: *2022*, *Liquidaciones*, hacer clic en *Datos por Entidad Local. Máximo nivel de desglose (Formato ACCESS)*
+
+<h3><b>Datos ODS 2</b></h3>
+**Tasa de privación material severa**: [Tasa de privación material severa: comarcal - Banco da Datos Terrirorial - IVE](https://bdo.gva.es/bdo/res_optimo_static.php?cons=V0025_C2D0022&idioma=cas&form=xlsx){target="_blank"}. Para los datos de Pobreza Severa, ver ODS 1.
+
+<h3><b>Datos ODS 3</b></h3>
+**Tasa de defunciones prematuras**, **Edad media de defunción**, **Tasa de mortalidad por suicidio** y **Tasa de mortalidad por suicidio**: [microdatos de mortalidad y sus causas](https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736176780&menu=resultados&idp=1254735573175#_tabs-1254736195294){target="_blank"} facilitados por el **Instituto Nacional de Estadística**. **Remesa directa vía email**.
+
+<h3><b>Datos ODS 4</b></h3>
+- [Completamiento segunda etapa de Educación Secundaria y Postsecundaria no Superior - Censo Anual 2021-2022 (INE)](https://www.ine.es/dynt3/inebase/es/index.htm?padre=10608&capsel=10612){target="_blank"}. Hay que realizar dos selecciones: una para los municipios de más de 500 habitantes o más, y una para municipios de menos de 500 habitantes.
+- **Tasa de gasto municipal medio en educación**: Ver *Tasa de gasto en Servicios sociales y promoción social* (ODS 1).
+- **Actividades de educación para el desarrollo en centros educativos del municipio (2020)**: datos facilitados vía email por la **Dirección General de Cooperación y Solidaridad** de la GVA.
+
+<h3><b>Datos ODS 5</b></h3>
+- **Tasa de delitos contra la libertad sexual**: Ir a [Balance trimestral de la criminalidad, 4º trimestre 2024](https://estadisticasdecriminalidad.ses.mir.es/publico/portalestadistico/datos.html?type=pcaxis&path=/DatosBalanceAnt/20244/&file=pcaxis){target="_blank"}: ver opción **1.3**.
+- [Participación del municipio a la Red Valenciana de Igualdad](https://inclusio.gva.es/es/web/igualtat-i-institut-de-les-dones/xarxa-valenciana-d-igualtat){target="_blank"}. Para recopilar los miembros de mancomunidades descargar los ficheros desde el [Registro de Entidades Locales](https://ssweb.seap.minhap.es/REL/frontend/inicio/mancomunidades){target="_blank} del Ministerio de Política Territorial y Memoria Historica.
+
+<h3><b>Datos ODS 6</b></h3>
+**Vulnerabilidad municipal por contaminación de las aguas por nitratos**: recopilar manualmente los municipios indicados en los tres decretos:
+
+- [Aguas subterráneas: DECRET 86/2018, de 22 de juny](https://mediambient.gva.es/documents/163005665/169939259/Municipios+vulnerables_MASubt.pdf/730c4afb-bddf-413f-8af2-466367f456e0){target="_blank"}. 
+- [Aguas supeficiales: DECRET 86/2018, de 22 de juny](https://mediambient.gva.es/documents/163005665/169939259/Municipios+vulnerables_MASuperf.pdf/5934d2d8-862f-43a8-9b0d-2b4355df573c){target="_blank"}. 
+- [Ampliación: DECRET 81/2022, de 10 de juny](https://dogv.gva.es/datos/2022/06/21/pdf/2022_5520.pdf){target="_blank"}.
+
+<h3><b>Datos ODS 7</b></h3>
+- **Tasa de viviendas con aislamiento deficiente**: descargar datos de 2022 de del [Portal de datos abiertos del registro de los certificados de eficiencia energética en la Comunitat Valenciana](https://gceedadesobertes.aven.es/dadesobertes/){target="_blank}.
+- **Nivel estimado de riesgo de vulnerabilidad energética**: recuperar datos de Pobreza severa (ODS1).
+
+<h3><b>Datos ODS 8</b></h3>
+
+- **Tasa de demandantes de empleo sobre la población entre 16 y 64 años (2024)**: ir a [Datos demandantes de empleo por municipios a 31 de diciembre 2024 (1 de enero 2025)](https://labora.gva.es/documents/166000883/177120029/Demandantes+activos+parados+por+municipios+%28XLSX%29.xlsx/5711e6e4-4c3b-48ee-aa39-7f5dee3d804b){target="_blank"}. Para la población por edad y municipios capítulo **Datos de población**.
+- **Tasa de demandantes de empleo menores de 25 años (2024)**: ver punto anterior.
+
+<h3><b>Datos ODS 10</b></h3>
+- **Tasa de personas con ingresos inferiores al 50% de la mediana (2022)**: ir a [Atlas de distribución de renta de los hogares](https://www.ine.es/dynt3/inebase/index.htm?padre=7132){target="_blank"}: [Alicante/Alacant](https://www.ine.es/jaxiT3/Tabla.htm?t=30839&L=0){taget="_blank"}, [Castellón/Castelló](https://www.ine.es/jaxiT3/Tabla.htm?t=30967&L=0){target="_blank"}, [Valencia/Valéncia](https://www.ine.es/jaxiT3/Tabla.htm?t=31255&L=0){target="_blank"}. Elegir *Población con ingresos por unidad de consumo inferiores al 50% de la mediana*.
+- **Índice Gini (2022)**: ir a [Atlas de distribución de renta de los hogares](https://www.ine.es/dynt3/inebase/index.htm?padre=7132){target="_blank"}: [Alicante/Alacant](https://www.ine.es/jaxiT3/Tabla.htm?t=37733&L=0){target="_blank"}, [Castellón/Castelló](https://www.ine.es/jaxiT3/Tabla.htm?t=37691&L=0){target="_blank"}, [Valencia/Valéncia](https://www.ine.es/jaxiT3/Tabla.htm?t=37721&L=0){target="_blank"}.
+- **Tasa de dependencia (2022)**: ver arriba **INE: Padrón 2022 por edades - Año a año**.
+
+<h3><b>Datos ODS 11</b></h3>
+- **Vulnerabilidad urbana**: para datos de *Riesgo de Pobreza*, ver *ODS 1*, elegir las mismas opciones excepto *Secciones*, en lugar de municipios. Descargar los datos de [Habitantes por secciones censales (2022)](https://www.ine.es/dynt3/inebase/index.htm?padre=7132){target="_blank"}. Hay que seleccionar la provincia, la opción *Porcentaje de población con ingresos por unidad de consumo por debajo/encima de determinados umbrales relativos por sexo*, el año (máximo 2022), y la opción *Población con ingresos por unidad de consumo inferiores al 60% de la mediana*.
+- **Nivel de contaminación por PM10**: [Datos diarios contaminación - 2023](https://www.miteco.gob.es/content/dam/miteco/es/calidad-y-evaluacion-ambiental/sgalsi/atm%c3%b3sfera-y-calidad-del-aire/evaluaci%c3%b3n-2023/Datos%20diarios%202023.zip){target="_blank"}.
+- **Índice de despoblación**: [Datos de densidad municipal (2024)](https://bdt.gva.es/bdt/res_optimo_static.php?cons=C0V6449&idioma=cas&form=xlsx){target="_blank"}.
+
+<h3><b>Datos ODS 12</b></h3>
+- **Recogida selectiva de envases ligeros**: recopilar datos del buscador de ECOEMBES [Recogida selectiva de envases domesticos](https://www.ecoembes.com/es/el-proceso-de-reciclaje/datos-de-reciclaje-de-envases-domestico-en-espana/recogida-selectiva-de-envases-domesticos/barometro){target="_blank"}.
+- **Recogida selectiva de papel y cartón**: ídem.
+- **Recogida selectiva de vidrio**: [Datos de **ECOVIDRIO**](https://www.ecovidrio.es/reciclaje/datos-reciclaje){target="_blank"} (hay que seleccionar el año, 2022, la comunidad autónoma y las tres provincias valencianas).
+- **Ecoparques en el municipio**: recopilar datos del [Buscador de productores y gestores de residuos](https://residuos.gva.es/RES_BUSCAWEB/buscador_residuos_avanzado.aspx?idioma=C){target="_blank"} (Categoría "Ecoparques").
+
+<h3><b>Datos ODS 13</b></h3>
+- **Participación en compromisos internacionales por el clima**: [GCofM: Base de datos de proyectos y firmantes de la UE - 2023](https://jeodpp.jrc.ec.europa.eu/ftp/public/JRC-OpenData/GCOM-MyCovenant/2023_Fourth_release/df1_Signatories_4th%20Release%20-%20March%202023.xlsx){target="_blank"}, procesar la tercera hoja de cálculo.
+
+<h3>ODS 15</h3>
+- **Tasa de ocupación de bosques**:
+1. [Superficie cadastral rústica total - Alicante/Alacant](https://www.catastro.hacienda.gob.es/jaxi/tabla.do?path=/est2024/catastro/rustico/&file=04103.px&type=pcaxis&L=0){target="_blank"}.
+2. [Superficie cadastral rústica total - Castellón/Castelló](https://www.catastro.hacienda.gob.es/jaxi/tabla.do?path=/est2024/catastro/rustico/&file=04112.px&type=pcaxis&L=0){target="_blank"}.
+3. [Superficie cadastral rústica total - Valencia/Valéncia](https://www.catastro.hacienda.gob.es/jaxi/tabla.do?path=/est2024/catastro/rustico/&file=04146.px&type=pcaxis&L=0){target="_blank"}.
+
+a. [% Tipos de cultivo - Alicante/Alacant](https://www.catastro.hacienda.gob.es/jaxi/tabla.do?path=/est2024/catastro/rustico/&file=04203.px&type=pcaxis&L=0){target="_blank"}.
+b. [% Tipos de cultivo - Castellón/Castelló](https://www.catastro.hacienda.gob.es/jaxi/tabla.do?path=/est2024/catastro/rustico/&file=04212.px&type=pcaxis&L=0){target="_blank"}.
+c. [% Tipos de cultivo - Valencia/Valéncia](https://www.catastro.hacienda.gob.es/jaxi/tabla.do?path=/est2024/catastro/rustico/&file=04246.px&type=pcaxis&L=0){target="_blank"}.
+
+- [Superficies totales de los municipios (2024)](https://bdt.gva.es/bdt/res_optimo_static.php?cons=C0V6527&idioma=val&form=xlsx){target="_blank"}.
+
+<h3>ODS 16</h3>
+- **Tasa de criminalidad general**: [Balance trimestral de la criminalidad, 4º trimestre 2024](https://estadisticasdecriminalidad.ses.mir.es/publico/portalestadistico/datos.html?type=pcaxis&path=/DatosBalanceAnt/20244/&file=pcaxis){target="_blank"}. Seleccionar **1.3**.
+- **Tasa de de homicidios e intentos de homicidios**: ídem.
+
+<h3>ODS 17</h3>
+- **Miembros de la Red de Ciudades Educadoras**: [página web de la aAsociación Internacional de Ciudades Educadoras (AICE)](https://www.edcities.org/listado-de-las-ciudades-asociadas/){target="_blank"}. Marcar *España*.
+- **Tasa de presupuesto dedicado a Cooperacion Internacional**: datos de importes aportados a Cooperación Internacional (2021), facilitados directamente por el FVS, completados por [datos recopilados de la FEMP](http://cooperacion.femp.es/){target="_blank"} y los [datos de las liquidaciones de presupuestos municipales de 2021](https://serviciostelematicosext.hacienda.gob.es/SGFAL/CONPREL){target="_blank"}. Marcar el año y si se quieren presupuestos o liquidaciones.
+
+

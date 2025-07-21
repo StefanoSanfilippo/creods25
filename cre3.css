@@ -1,0 +1,184 @@
+
+.navbar {
+  background: linear-gradient(#8e131d,#d21a2b);
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden; /* Para que la barra de scroll solo se vea en la parte inferior */
+  width: 200px; /* Modify the width of the sidebar */
+  font-size: 9pt;
+  margin-bottom: 100px;
+}
+
+.navbar-brand {
+  position: fixed;
+  top: 0px;
+  text-wrap: wrap;
+  width: 200px;
+  font-size: 13px;
+  line-heigt: 15px;
+}
+
+.navbar-author {
+  text-wrap: wrap;
+  color: white;
+  font-size: 12px;
+}
+
+
+.navbar-nav {
+  height: 87%;
+  position: absolute;
+  margin-top: 100px;
+  padding-top: 10px;
+  overflow: hidden;
+  padding-bottom: 100px;
+  margin-bottom: 100px;
+}
+
+.navbar-nav:hover { /* ======== Se ve la barra de scroll solo cuando se usa--- */
+  overflow-y: scroll;
+}
+
+#dashboard-container{
+  overflow: auto;
+ height: 98%;
+ padding-top: 49px;
+ padding-bottom: 5px;
+ position: absolute;
+ top: 0px;
+ right: 0px;
+ left: 200px;
+}
+
+.desktop-layout {
+ 
+ 
+}
+
+.navbar-inverse .navbar-nav > .active > a,
+.navbar-inverse .navbar-nav > .active > a:hover,
+.navbar-inverse .navbar-nav > .active > a:focus {
+    background-color: white;
+    color: #c52026;
+}
+
+.navbar-inverse .navbar-nav > li > a:hover,
+.navbar-inverse .navbar-nav > li > a:focus {
+    background-color: #c52026;
+    color: white;
+}
+
+/* ========== Format when menu--- */
+.navbar-inverse .navbar-nav>.open>a, 
+.navbar-inverse .navbar-nav>.open>a:hover, 
+.navbar-inverse .navbar-nav>.open>a:focus{
+     background-color: white;
+     color: #c52026;
+}
+
+
+div.chart-title { /* ================ Format inside: chart titles--- */
+    font-weight: bold;
+    color: #c52026;
+}
+
+.nav-tabs-custom > .nav-tabs > li.active a {  /* ================ Format inside: tabs titles-- */  
+    font-weight: bold;
+    color: #c52026;
+    border-top-color: none;
+}
+
+.nav-tabs-custom > .nav-tabs > li:not(.active) a {    
+    color:#1D5C6A;
+}
+
+
+ /* ================ Format Apuntes metodológicos y fuentes de datos --- */
+
+
+#aspectos-metodológicos-fuentes-de-datos-y-bibliografia {
+    background-color: white;
+    top: 0px; left: 200px;
+    text-justify: auto;
+    padding-left: 10px;
+    padding-right: 5px;
+}
+
+
+/* ================ Format botones --- */
+
+.button_large {
+  padding: 15px 32px;
+  font-size: 18px;
+  color: #ffffff;
+  background-color: #8e131d;
+  font-weight: bold;
+  border-color: #ffffff;
+  border-radius: 30px;
+  cursor: pointer;
+  margin-top: 60px;
+  margin-bottom: 60px;
+  margin-left: 20px;
+}
+
+.button_large:link {
+  padding: 15px 32px;
+  font-size: 18px;
+  color: #ffffff;
+  background-color: #8e131d;
+  font-weight: bold;
+  border-color: #ffffff;
+  border-radius: 30px;
+  cursor: pointer;
+  margin-top: 60px;
+  margin-bottom: 60px;
+  margin-left: 20px;
+}
+
+.button_large:hover {
+  background-color: #d21a2b;
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.button_large:visited {
+  color: #ffffff;
+  background-color: #d21a2b;
+  text-decoration: underline;
+}
+
+.button_large:active {
+  background-color: #d21a2b;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+/* ===============El drop-down============================== */
+/* colors background: #b77b7f,#e5d0d6, colors font: white, 6f0f36  */
+.dropdown-toggle:not(.active) {
+        background:#8e131d;
+        color: white;
+}
+}
+.open > .dropdown-toggle {
+        background:#8e131d; !important; 
+        color:white; !important;      
+}
+
+.open > .dropdown-menu > li.active {
+        background: #8e131d;
+        color: white;
+}
+.open > .dropdown-menu > li > a {
+      background: #d21a2b;
+      font-size: 11px;
+      word-wrap: break-word;
+      white-space: normal;
+      width: 150px;}
+.open > .dropdown-menu > li.active > a {background: #d21a2b;}
+.open > .dropdown-menu > li.active > a:hover {background: #d21a2b;color: white;}
+.open > .dropdown-menu > li.active > a:focus {background: #d21a2b;color: white;}
+.open > .dropdown-menu > li:not(.active) > a:hover {background: #8e131d;color: white;}
+.open > .dropdown-menu > li:not(.active) > a:focus {background: #8e131d;color: white;}
+

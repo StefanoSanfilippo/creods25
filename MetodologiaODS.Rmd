@@ -1,0 +1,239 @@
+---
+title: "<img src=\"CR-ES-Horizontal-CMYK_page-164-53.jpg\" style=\"vertical-align: top; width:50%; height: auto; \"/> <br> <br> <br> <br> <br> <br> Notas metodológicas sobre la elaboración de los indicadores municipales sobre ODS en la CV"
+output:
+  prettydoc::html_pretty:
+    theme: leonids
+---
+<style>
+.cover{
+    background-color: white;
+    }
+    
+.cover-card .author_name {
+    color: #c42027;
+    font-weight: bolder;
+    font-size: 1.8em;
+    
+}
+</style>
+
+```{r include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(cache = FALSE)
+```
+
+## Apuntes metodológicos y fuentes de datos
+
+<h3><b>Premisa</b></h3>
+Este documento explica los principios y la metodología general para obtener los indicadores sobre ODS en la Comunitat Valenciana. Se explica el método de cálculo (sobre todo para aquellos indicadores en los que el método utilizado es más indirecto) y las fuentes de datos utilizadas. No se explica aquí el detalle de las diferentes operaciones de procesamiento y limpieza de los datos, que se han llevado a cabo en el entorno de programación de R. Para ello, si hubiera esta necesidad, recomendamos ponerse directamente con el equipo de Cruz Roja. Tampoco se detalla la aproximación epistemológica, sobre el porqué de priorizar unas dimensiones frente a otras, ya que entendemos que supera el alcance del trabajo de creación de la herramienta.
+
+El producto se ha concebido no como informe cerrado sino como **una herramienta viva, en evolución continua** pensada como **soporte al análisis y la toma de decisiones** de los equipos técnicos y directivos de Cruz Roja y de actores que la quieran utilizar.
+
+El objetivo de estas notas metodológicas es conseguir la **replicabilidad de los resultados** de la herramienta como estrategia para asegurar la **sostenibilidad** de la misma, independientemente del equipo que se encargue de su desarrollo.
+
+
+<h3>Municipios reseñados e indicadores</h3>
+
+Esta herramienta es un instrumento para analizar la totalidad de los **542 municipios valencianos**, sin excluir ningún municipio. Sin embargo este principio, que ha sido la base del encargo de Cruz Roja, hace que en diversos casos no se disponga del indicador para unos determinados municipios. Lo cual no invalida la herramienta, dado que el objetivo ha sido tener el máximo de indicadores para el máximo de municipios, sin embargo no podemos renunciar a un indicador importante aunque no se disponga del dato para la totalidad de los municipios. Esto ocurre sobre todo con indicadores que implican personas (salud, delincuencia, pobreza, etc.) para los que los agentes productores de datos introducen filtros para preservar la confidencialidad (*silencio estadístico*); esto se da en el caso de municipios pequeños, cuando el valor del dato a facilitar baja de un cierto límite de habitantes. De todos modos, cabe destacar que hemos procurado priorizar indicadores con mayor cobertura y hemos renunciado en ocasiones a indicadores disponibles solo para unos pocos municipios (por ejemplo, los indicadores para municipios de más de 50.000 habitantes o capitales de provincias).
+
+<h3>Selección y estructura de los indicadores</h3>
+El proceso de identificación, selección y construcción de los indicadores utilizados en el análisis tiene como punto de partida las necesidades de información de Cruz Roja, descritas en un documento inicial muy amplio y detallado. A partir de él, se ha realizado un rastreo de las fuentes de datos disponibles, en base al que se han podido identificar los indicadores viables, los que se podían adoptar modificando algún elemento y los que se tenían que descartar. En algún caso se ha propuesto un nuevo indicador.
+
+Todos los indicadores se han relacionado con un ODS concreto. Los **modelos** que se han seguido, de manera más sistemática, para **construir e identificar indicadores y localizar los datos** han sido básicamente:
+
+- La página web [Indicadores de la Agenda 2030 para el Desarrollo Sostenible](https://www.ine.es/dyngs/ODS/es/index.htm){target="_blank"} del Instituto Nacional de Estadística.
+- El Informe [Sisto, R., Benayas, J., 2021. Los municipios de la Comunidad de Madrid y la Agenda 2030. Diagnóstico sobre su grado de aplicación. INAECU y REDS / SDSN-SPAIN](https://reds-sdsn.es/ods-madrid/){target="_blank"} de la Red Española de Desarrollo Sostenible (REDS).
+- El informe [REDS, 2020. Los ODS en 100 ciudades españolas (2ª edición)](https://reds-sdsn.es/informe-ods-ciudades-2020/){target="_blank"}.
+
+Hay otros informes y documentos que se han utilizado, a lo largo del proceso: ver para ello los puntos específicos de este documento y también la página de *Bibliografia*.
+
+<h3>Fuentes de datos</h3>
+En este documento y en el *Catálogo de datos* se detallan las fuentes utilizadas para cada indicador. Se han utilizado los datos más recientes disponibles pertenecientes a **fuentes oficiales consolidadas y publicadas**, independientemente del formato (base de datos descargable, página web, buscador web). Hay dos excepciones: en dos casos los datos no se han obtenido de la red, sino de un envío directo por email, y corresponden a (i) los datos sobre Educación para la Ciudadanía Global en los centros educativos valencianos, facilitados por la **Dirección General de Inclusión y Cooperación al Desarrollo** de la Generalitat Valenciana; y (ii) una parte de los datos sobre aportación presupuestaria al 0.7% de los municipios valencianos aportada por el **Fons Valencià per la Solidaritat**.
+
+La **calidad, fiabilidad y disponibilidad futura** de las fuentes de datos es importante para asegurar la **viabilidad** de la herramienta en el medio-largo plazo.
+
+<h3>Estructura del instrumento</h3>
+
+- **Mapas municipales**: son unos mapas municipales interactivos coloreados con diversas intensidades según el valor del indicador. La interactividad permite leer los datos de cada municipio.
+- **Panel de índices integrados por ODS** en forma de tabla degradada, descargable en formato Excel.
+- **Listado de municipios**: se presentan todos los municipios en una tabla interactiva (permite ordenar y seleccionar variables) que contiene todos los indicadores, descargable en Excel.
+- **Fichas municipales**: cada municipio tiene un resumen individual, descargable en Excel.
+
+La descargabilidad de los documentos es importante para facilitar las tareas de análisis de los equipos de trabajo.
+
+<h3><b>Mapas de municipios y provincias</b></h3>
+
+El mapa por municipios se genera a partir de un archivo *shapefile* disponible en el portal de internet de datos abiertos [datos.gob.es](https://datos.gob.es){target="_blank"} del Ministerio para la Transfomación Digital y par la Función Pública:  [link directo](https://datos.gob.es/es/catalogo/a10002983-capa-de-municipios-de-la-comunidad-valenciana){target="_blank"}.
+
+El mapa de provincias se genera de un rchivo *shapefile* disponible en el portal [opendatasoft.com](https://www.opendatasoft.com/en/){target="_blank"}:  [link directo](https://public.opendatasoft.com/explore/dataset/provincias-espanolas/table/?sort=provincia){target="_blank"}
+
+<h3><b>Datos de población</b></h3>
+**Población municipios - Años 2019 2020, 2021, 2022, 2023, 2024** 
+Para los cálculos de los índices, en muchos casos, ha sido necesario fusionar los datos obtenidos con tablas de población por municipios, de años diferentes (en función del año de referencia de los datos obtenidos).
+Par ello, hemos obtenido los datos de población del [Banco de Datos Terrritorial del Institut Valencià de Estadística (IVE)](https://bdt.gva.es/bdt/){target="_blank"}, que además, junto con el **Instituto Nacional de Estadística (INE)**, ha sido una importante fuente de datos para nuestro trabajo.
+Específicamente la tabla original del padrón, años 1996-2023, que utilizamos se descarga en [este enlace](https://bdt.gva.es/bdt/res_optimo_static.php?cons=C1V4873&idioma=cas&form=xls){target="_blank"}. Su fuente es el padrón continuo. Tratándose de una tabla muy grande, que contiene datos de muchos años y por sexo han sido necesarias varias operaciones de limpieza y selección, que quedan reflejadas en el fichero Rmd correspondiente.
+
+Para algunos indicadores (ver más abajo) también ha sido necesario disponer del [Padrón continuo-Año en año](https://www.ine.es/dynt3/inebase/index.htm?padre=6225&capsel=6225){target="_blank"} del INE. A partir del año 2023, los datos de población por edad, año a año se obtienen del [Censo Anual de población](https://www.ine.es/dynt3/inebase/index.htm?padre=10607&capsel=10607){target="_blank"}.
+
+<h3>ODS 1</h3>
+- **Tasa de Riesgo de Pobreza**: Población con **ingresos por unidad de consumo por debajo 60% de la mediana nacional**. Es la definición aceptada para población en riesgo de pobreza ([Ver INE](https://www.ine.es/ss/Satellite?L=es_ES&c=INESeccion_C&cid=1259925455948&p=%2F&pagename=ProductosYServicios%2FPYSLayout&param1=PYSDetalle&param3=1259924822888#:~:text=Umbral%20de%20riesgo%20de%20pobreza,la%20renta%20entre%20la%20poblaci%C3%B3n.){target="_blank"}).  Los dato se obtienen directamente del [Atlas de distribución de renta de los hogares del INE](https://www.ine.es/dynt3/inebase/index.htm?padre=7132){target="_blank"}, se bajan separadamente por provincias y se integran posteriormente.
+- **Tasa de Pobreza Severa**: Población con **ingresos por unidad de consumo por debajo 40% de la mediana nacional**. Es la definición aceptada para población en pobreza severa: Ver por ejemplo [El mapa de la pobreza severa en España, EAPN España, 2022](https://www.eapn.es/ARCHIVO/documentos/noticias/1671549839_2022-abandonadas.-la-pobreza-severa-en-espaa.pdf){target="_blank"}, pág. 5. Los dato se obtienen directamente del [Atlas de distribución de renta de los hogares del INE](https://www.ine.es/dynt3/inebase/index.htm?padre=7132){target="_blank"}, se bajan separadamente por provincias y se integran posteriormente.
+- **Tasa municipal de Pobreza Infantil Severa**: **Población menor de 18 años** con ingresos por unidad de consumo por **debajo del 40% de la mediana nacional (%)**. Ver también el [Alto Comisionado contra la Pobreza Infantil](https://www.comisionadopobrezainfantil.gob.es/es){target="_blank"}. Los dato se obtienen directamente del [Atlas de distribución de renta de los hogares del INE](https://www.ine.es/dynt3/inebase/index.htm?padre=7132){target="_blank"}, se bajan separadamente por provincias las tablas de **datos por tramos de edad y sexo** y se integran posteriormente.
+- **Tasa de gasto por hab. en Servicios sociales y promoción social**: En la actualización de 2025, se trata de la tasa media que se obtiene de la liquidación de los presupuestos de 2021, 2022 i 2023, dividiendo el importe de de la **política de gasto número 23** del presupuesto según la clasificación por programas ([ver orden Orden EHA/3565/2008, de 3 de diciembre](https://www.boe.es/buscar/act.php?id=BOE-A-2008-19916){target="_blank"}) por el total de los habitantes del municipio en el año 2022 (el del medio): 
+$$\frac{Valor Medio 23_{21|22|23}}{Habitantes}$$
+En esta edición de 2025 trabajamos con los valores medios para disminuir el efecto que pueden producir eventos o inversiones puntuales en el presupuesto municipal, sobre todo en municipios pequeños.
+
+En nuestro caso, hemos obtenido los datos contables de las entidades locales del **Ministerio de Hacienda y Función Pública**, específicamente del portal [CONPREL: CONSULTA PRESUPUESTOS Y LIQUIDACIONES DE EELL](https://serviciostelematicosext.hacienda.gob.es/SGFAL/CONPREL){target="_blank"} (hay que marcar el año y si se quieren presupuestos o liquidaciones. El portal facilita un base de datos en *Access* de la que hemos extraído los datos en formato texto para su posterior procesamiento.
+
+<h3>ODS 2</h3>
+**Nivel estimado de Privación Material Severa AROPE**: el Índice de Privación Material Severa sería un indicador muy potente que se recoge en la [Encuesta de Condiciones de Vida - ECV](https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736176807&idp=1254735976608){target="_blank"} que realiza el INE anualmente. Sin embargo, no se disponen de datos directos de ámbito municipal para obtener dicho indicador.
+
+A pesar de no ser directamente medible, hemos decidido incluir una estimación de tipo categórico, a partir de la constatación de la existencia de un nivel alto de correlación entre **Privación Material Severa(ECV)** y **Pobreza Severa (INE)** que acabamos de ver entre los indicadores del ODS 1. En [este documento](https://gaiacooperacion.net/proves/CarenciaSevera.html){target="_blank"} describimos la relación linear (coef. de Pearson) existente entre ambas variable a nivel de valores comarcales (la Privación Material Severa se obtiene del [Banco de Datos Territorial del IVE - Datos subregionales](https://pegv.gva.es/es/indicadores-de-pobreza-y-condiciones-de-vida-a-nivel-subregional){target="_blank"}).
+
+Dada la correlación existente entre ambos indicadores, podemos plantear que el valor de la diferencia entre el valor municipal y el valor comarcal de un indicador se mantenga proporcional respecto a la misma diferencia en el otro indicador.
+Esto es:
+
+Valor Municipal Pobreza Severa $=ps_{i}$ 
+Media Comarcal de la Pobreza Severa $=mps_{com}$ 
+Valor municipal de Privación Material Severa $=pms_{i}$
+Valor Comarcal de la Privación Material Severa $=mpms_{com}$
+
+$$\frac{(ps_{i}-mps_{com})}{mps_{com}}=\frac{(pms_{i}-mpms_{com})}{mpms_{com}}$$
+
+Por lo tanto, aplicando dicha proporcionalidad, estimamos que el valor de la Privación Material Severa $pms_{i}$ a nivel municipal será:
+
+$$pms_i= 1+\frac{ps_{i}-mps_{com}}{mps_{com}}$$
+
+Puesto que este cálculo es una estimación basada en la correlación existente entre dos variables que en cualquier caso debería ser corroborada por *tests* más concluyentes, para ese indicador hemos establecido un índice estimado de cuatro niveles, cuatro segmentos iguales entre el valor mínimo y el valor máximo: *Bajo, Medio, Alto, Muy alto*. A efectos de cálculo de índices los valores categóricos se convierten en enteros: 1, 2, 3, 4.
+Entendemos que **no es lo ideal** pero es una manera de **aproximarnos** a un indicador que, de otro modo no sería disponible a nivel municipal.
+
+
+<h3>ODS 3</h3>
+- **Tasa de defunciones prematuras**: este indicador mide la proporción de defunciones en edades que podemos considerar tempranas. Hemos seguido el modelo de [REDS, 2020. Los ODS en 100 ciudades españolas (2ª edición)](https://reds-sdsn.es/informe-ods-ciudades-2020/){target="_blank"}.
+En base a este modelo, se consideran prematuras todas las defunciones antes de la edad de 65 años. 
+- **Edad media de defunción**: sustituye la Esperanza de vida, de cálculo complejo, para comunidades pequeñas.
+- **Tasa de mortalidad por suicidio**: ver puntos anteriores.
+- **Tasa de mortalidad por infarto del miocardio**: ver puntos anteriores
+
+Para la obtención de estos índices, hemos utilizado [microdatos de mortalidad y sus causas](https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736176780&menu=resultados&idp=1254735573175#_tabs-1254736195294){target="_blank"} facilitados por el **Instituto Nacional de Estadística** tras nuestra solicitud, disponibles para municipios de más de 10.000 habitantes. Además, para obtener la **Tasa de defunciones Prematuras** hemos necesitados **Censo Anual de Población por edad año a año (ver arriba)**.
+
+<h3>ODS 4</h3>
+- **Tasa de completamiento segunda etapa de Educación Secundaria y post secundaria no Superior (%)**: Es la tasa (%) de personas que logran este nivel educativo (segunda etapa de Secundaria y eventuales grados medios o superiores). Importante: **excluye tanto los niveles inferiores como los superiores**. Se calcula sobre la población total del municipio (2021):
+Población que ha completado el nivel: $Pob_{diploma}$; Población total: $Pob_{tot}$;
+$$Indicador=\frac{Pob_{diploma}}{Pob_{tot}}\times100$$
+Como se ve, no se selecciona ninguna banda de edad sobre la que realizar cálculo. Esto se hace para poder tener el dato para el máximo de municipios y no perder dato por *silencio estadístico*. En esta edición, los datos se obtienen del [Censo anual de población 2021-2022](https://www.ine.es/dynt3/inebase/es/index.htm?padre=10608&capsel=10612){target="_blank"}. Hay que realizar una serie de selecciones sucesivas para llegar a la tabla que se descarga.
+- **Gasto municipal en educación / hab.**: En la edición de 2025, es la tasa que se obtiene de las liquidaciones de los presupuestos de 2021, 2022 y 2023, de la política 32. Trabajamos con importes medios, introduciendo tres años contables y realizando el cálculo del promedio en este caso, para disminuir el peso de importes "*outliers*", seguramente debidos a inversiones puntuales. Para el resto se opera  dividiendo el importe medio calculado (2021, 2022, 2023) de la **política de gasto 32 - Educación** del presupuesto según la clasificación por programas ([ver orden Orden EHA/3565/2008, de 3 de diciembre](https://www.boe.es/buscar/act.php?id=BOE-A-2008-19916){target="_blank"}) por el total de los habitantes del municipio: $$\frac{Valor Medio 32_{21|22|23}}{Habitantes}$$
+También en este caso, hemos obtenido los datos contables de las entidades locales del **Ministerio de Hacienda y Función Pública**, específicamente del portal [CONPREL: CONSULTA PRESUPUESTOS Y LIQUIDACIONES DE EELL](https://serviciostelematicosext.hacienda.gob.es/SGFAL/CONPREL){target="_blank"} (hay que marcar el año y si se quieren presupuestos o liquidaciones. El portal facilita un base de datos en *Access* de la que hemos extraído los datos en formato texto para su posterior procesamiento.
+- **Educación para el Desarrollo en centros educativos del Municipio**: hemos procesado datos no publicados, facilitados por la **Dirección General de Cooperación y Solidaridad** de la Generalitat Valenciana. Se trata de fichas en formato *pdf* que resumen las **actividades de EpCG** llevadas a cabo, en el marco de la convocatoria 2020, **en los centros educativos valencianos**, por las ONGD valencianas. Del procesamiento de esas fichas, se pueden obtener los **municipios donde se encuentran los centros** en los que se han ejecutado dichas actividades. Cabe destacar que además de esas fichas, la Dirección General nos entregó fichas de actividades de sensibilización que sin embargo no se pudieron procesar. El dato que se obtiene es un dato categórico de cobertura: "Sí" - "No" (realizadas actividades o no en el municipio), no de intensidad. En el cálculo de los índice se convierte en entero: 1, 0, respectivamente.
+
+<h3>ODS 5</h3>
+- **Delitos contra la libertad sexual por 10.000 hab.**: el dato se obtiene del [Balance trimestral de la criminalidad, 4º trimestre 2024](https://estadisticasdecriminalidad.ses.mir.es/publico/portalestadistico/datos.html?type=pcaxis&path=/DatosBalanceAnt/20244/&file=pcaxis){target="_blank"}, del Ministerio de Interior. Los delitos están clasificados por categorías y cuantificados, **para municipios de más de 20.000 habitantes*. La categoría es *5. Delitos contra la libertad sexual* que tiene 2 subcategorías. El dato facilitado es por número de casos. Nuestro trabajo ha sido poner en relación el número de casos con la población del municipio.
+$$Indicador=\frac{Casos}{hab.}\times10000$$
+
+- **Participación en la Red Valenciana de Igualdad**: La obtención de las Entidades Locales participantes en la Rde Valenciana de Igualdad (RVI) promovida por la [Dirección General de Igualdad y del Instituto de las Mujeres](https://inclusio.gva.es/es/web/igualtat-i-institut-de-les-dones/xarxa-valenciana-d-igualtat){target="_blank"} se ha realizado en 2 fases: primero se han recopilado (*scraping*) las instituciones listadas en el índice de la página; en segundo lugar, como la mayoría de los ayuntamientos participan no directamente, sino a través de alguna mancomunidad, hemos tenido que recuperar los ayuntamientos miembros de las mancomunidades listadas, recopilando los datos de Mancomunidades del [BUSCADOR DE ENTIDADES LOCALES](https://www.gva.es/es/inicio/atencion_ciudadano/buscadores/administraciones_locales){target="_blank"} y posteriormente fusionarlos con los del Instituto de las Mujeres. Hemos obtenido así una tabla de ayuntamientos miembros de la Red Valenciana de Igualdad. El indicador es categórico, "Sí" - "No", que se convierten en 1,0 respectivamente, en el cálculo de los índices.
+
+<h3>ODS 6</h3>
+**Vulnerabilidad municipal por contaminación de las aguas por nitratos**: Hemos recopilado los datos de los municipios declarados vulnerables por la presencia de nitratos en las aguas superficiales y/o subterráneas, directamente de los [tres decretos](https://mediambient.gva.es/es/web/agua/zones-vulnerables){target="_blank"} publicados en por la GVA (Orden 10/2018, Decreto 86/2018, Decreto 81/2022). Este indicador: la presencia de los dos factores a la vez se cuantifica con un 2, la presencia de uno de los dos, con un 1, la ausencia de ambos, con 0.
+
+<h3>ODS 7</h3>
+- **Tasa de viviendas con aislamiento deficiente**: Es un indicador que está incluido únicamente en los mapas, ya que forma parte del indicador *Nivel estimado de riesgo de vulnerabilidad energética*. De todos modos, hemos aumentado su solidez como indicador. Su mejora de solidez se ha obtenido utilizando no solamente los datos de los certificados energéticos del últimos año dispnible, sino de **todos los certificados que tengan vigencia en 2025**. Esto conlleva analizar todos (alrededor de unos 900.000) los certificados emitidos entre 2015 y 2024 (los del año 2025 no están disponibles). Los datos se pueden encontrar en la [página web correspondiente del IVACE](https://gceedadesobertes.aven.es/dadesobertes/Home){target="_blank"}. El tratamiento consiste en contar los certificados energeticos vigentes y establecer, para cada municipio, el **% de certificados con valoración "G"**, la más baja de todas. 
+- **Nivel estimado de riesgo de vulnerabilidad energética**: Es un indicador categórico, calculado indirectamente, que hemos decidido utilizar, delante de la imposibilidad de obtener datos directos sobre pobreza energética, *Gasto desproporcionado, Indicador de gasto energético insuficiente, Indicador de retraso en pagos, Indicador de retraso en pagos, Indicador de temperatura inadecuada* (todos indicadores que están el [Informe de Indicadores de Pobreza Energética en España 2022](https://www.comillas.edu/noticias/la-pobreza-energetica-siguio-creciendo-en-espana-en-2022/#:~:text=El%20Informe%20de%20Indicadores%20de,temperatura%20adecuada%20en%20sus%20hogares.){target="_blank"}), hemos optado por proceder de una manera sencilla generando un indicador que combinara el elemento de vulnerabilidad socioeconómica (el indicador de Pobreza Severa) con un elemento de debilidad estructural desde la perspectiva de las infraestructuras. Para ello, hemos testado diferentes alternativas [en un documento aparte](https://gaiacooperacion.net/proves/PobrezaEnergMetod.html), y hemos decidido optar por la siguiente alternativa: crear un índice compuesto entre dos variables:
+
+    - Tasa de Pobreza Severa (ver ODS 1)
+    - Tasa de viviendas con aislamiento deficiente (ver indicador anterior)
+
+Esta opción de crear un **indice compuesto** combinando un un indicador de pobreza con un elemento de debilidad energética de estructuras, se ha utilizado recientemente también en un estudio sobre pobreza energética en la ciudad de Valencia ([Sujar Cost A., ANALISIS GEOESPACIAL DE LA DISTRIBUCIÓN DE LA POBREZA ENERGÉTICA DEL SECTOR RESIDENCIAL DE LA COMUNIDAD VALENCIANA, 2022](https://riunet.upv.es/handle/10251/185142?show=full){target="_blank"}). Nosotros vamos a utilizar un enfoque similar, **identificando unas categorías determinadas para los diferentes niveles de los dos indicadores implicados**.
+Una vez obtenidas las dos tasas, normalizamos creando dos índices: **Índex de pobreza severa** e **Índex de ineficiencia energética**, aplicando la fórmula:
+$$Indice_{i}=\frac{Valor_{i}-Valor_{min}}{Valor_{max}-Valor_{min}}$$
+Tratándose de un indicador experimental, en lugar de integrar ambos índices por media aritmética hemos optado por generar 4 categorías: *Bajo, Medio-bajo, Medio-alto, Alto*, para los cuatro diferentes niveles numéricos de los indicies: 0-0.25, 0.25-0.50, 0.50-0.75, 0.75-1. De la combinación dichas cuatro categorías o niveles en los dos índices se genera la tabla siguiente:
+
+
+
+```{r}
+library(flextable)
+library(dplyr)
+
+data.frame(AltoNivelG= c("Muy alto", "Muy alto", "Alto", "Medio"),
+           M.AltoNivelG= c("Muy alto","Alto","Medio","Medio"),
+           M.BajoNivelG= c("Alto","Medio","Medio","Bajo"),
+           BajoNivelG= c("Medio", "Medio", "Bajo", "Bajo"),
+           row.names = c("Pobreza severa - Nivel alto",
+                         "Pobreza severa - Nivel medio-alto",
+                         "Pobreza severa - Nivel medio-bajo",
+                         "Pobreza severa - Nivel bajo")) |> 
+    add_rownames() |> 
+    flextable() |> 
+    width(width = 2) |> 
+    set_header_labels(rowname= '', AltoNivelG= 'Alto índice de ineficiencia enrgética',M.AltoNivelG= "Medio-alto índice de ineficiencia energética",M.BajoNivelG= "Medio-bajo índice de ineficiencia energética", BajoNivelG= 'Bajo índice de ineficiencia enrgética') |> 
+    set_caption('Niveles de riesgo de Vulnerabilidad Energética en función de los indices de Pobreza Severa y de Ineficiencia energética')
+
+
+```
+Estos valores aparecen en el la representación cartográfica y en la ficha municipal, mientras que en el mapa de calor y en el listado general se pasan al formato de número entero (1-4).
+
+<h3>ODS 8</h3>
+
+- **Tasa de demandantes de empleo**: Esta tasa se calcula en % sobre el total de la población entre 16 y 64 años, aprovechando datos de población del [Censo anual de poblacion 2021-2024. Resultados por municipios (Población por sexo y edad año a año)](https://www.ine.es/dynt3/inebase/index.htm?padre=10607&capsel=10607){target="_blank"} y datos de [demandantes de empleo a diciembre de 2024 del portal Labora](https://labora.gva.es/va/estadisticassispehtml){target="_blank"}.
+- **Tasa de demandantes de empleo menores de 25 años**: Se calcula en % sobre el total de la población entre 16 y 24 años de edad, utilizando el [Censo anual de poblacion 2021-2024. Resultados por municipios (Población por sexo y edad año a año))](https://www.ine.es/dynt3/inebase/index.htm?padre=10607&capsel=10607){target="_blank"} y datos de [demandantes de empleo a diciembre de 2024 del portal Labora](https://labora.gva.es/va/estadisticassispehtml){target="_blank"}, extrayendo la tabla por edad.
+
+<h3>ODS 10</h3>
+
+- **Tasa de personas con ingresos inferiores al 50% de la mediana**: este dato es facilitado por el [INE](https://www.ine.es/dynt3/inebase/index.htm?padre=7132){target="_blank"}. Es una magnitud que está entre la Pobreza Severa (ingresos inferiores al 40% de la mediana) y el Riesgo de Pobreza (60%), que hemos visto en el ODS 1. 
+- **Índice Gini**: este dato es un indicador económico que mide la uniformidad/disformidad de la distribución de un conjunto de datos, en este caso las rentas. Esto es, cuanto más cercano a 0 más uniforme es la distribución de las rentas, cuanto más cercano a 100 más disforme y desigual es dicha distribución. La fuente de datos es la misma que el indicador anterior.
+- **Tasa de dependencia**: la tasa de dependencia es un indicador demográfico que mide en una población la proporción de personas en edad que se supone "económicamente inactiva" (menores de 16 años, mayores de 64) con relación al total de personas en edad "económicamente activa" (entre 16 y 64 años). Los datos se obtienen del [Censo anual de poblacion 2021-2024. Resultados por municipios (Población por sexo y edad año a año)](https://www.ine.es/dynt3/inebase/index.htm?padre=10607&capsel=10607){target="_blank"}, que ya hemos visto para otros indicadores.
+
+<h3>ODS 11</h3>
+
+- **Vulnerabilidad urbana**: Se trata de un indicador sobre el que parece no existir aún una definición unívoca. En nuestro caso, para su definición, nos hemos basado en [modelos propuestos por otros autores](https://reds-sdsn.es/ods-madrid/){target="_blank"} que nos han parecido interesantes. Este indicador mide la **proporción de habitantes de un municipio que vive en secciones vulnerables**. Nuestra definición: *Una sección es vulnerable cuando la Tasa de Riesgo de pobreza (ODS1) supera la media de la Provincia a la que pertenece el municipio*. NOTAR BIEN: Es una adaptación de la definición de [Sisto, R., Quintanilla, A., García, J., 2020](https://reds-sdsn.es/informe-ods-ciudades-2020/){target="_blank"}. **Dichos autores utilizan la media nacional como referencia. Nosotros optamos por la media provincial, por adaptarse mejor a la realidad local. Sin embargo, esta no es una cuestión cerrada aún**. Los datos (2022) de Pobreza por secciones se descargan de [INE - Atlas de distribución de renta de los hogares - Resultados por municipios, distritos y secciones censales](https://www.ine.es/dynt3/inebase/index.htm?padre=7132){target="_blank"}. Hay que elegir la provincia y la opción "Secciones" > "Porcentaje de población con ingresos por unidad de consumo por debajo/encima de determinados umbrales relativos por sexo" y, una vez dentro, elegir: Unidades territoriales: Secciones. Para saber cuántos habitantes viven en secciones censales vulnerables hemos de obtener los datos del INE de [Habitantes por secciones censales (2022) - Censo Anual de Población 2021-2024](https://www.ine.es/dynt3/inebase/index.htm?padre=11555&capsel=11100){target="_blank"} y fusionarlos con los datos de vulnerabilidad.
+- **Nivel por contaminación de PM10**: Número de días del año con concentración de PM10 superior a 40 μg/m3. Este límite se ha marcado a partir de la [Resolución de 2 de septiembre de 2020, de la Dirección General de Calidad y Evaluación Ambiental](https://www.boe.es/buscar/doc.php?id=BOE-A-2020-10426){target="_blank"}, en la que se determinan los límites de contaminación por diversos agentes. Hemos elegido el valor de 40 μg/m3 como límite para contar los días y construir el indicador porque la Resolución define diferentes niveles para este indicador y, a partir del valor 40 μg/m3, el nivel de contaminación se define *Regular*, recomendando lo siguiente: "La calidad del aire probablemente no afecte a la población general pero **puede presentar un riesgo moderado para los grupos de riesgo**." Existen otros límites que se podrían estimar. Cabe destacar que la OMS ha manifestado recientemente que en futuro recomendará bajar este límite hasta los 20 μg/m3. Para elaborar el indicador tenemos que obtener los datos de la página [*Datos oficiales Calidad del Aire 2023* del MITECO](https://www.miteco.gob.es/es/calidad-y-evaluacion-ambiental/temas/atmosfera-y-calidad-del-aire/evaluacion-y-datos-de-calidad-del-aire/datos/datos-oficiales-2023.html){target="_blank"}, eligiendo "*Dados diarios 2023*". También es importante descargar el fichero de metadatos disponible en la misma página.
+- **Índice de despoblación (2023)**: para no repetir un mero mapa de densidad de población, hemos querido construir un indicador que pusiera el foco en los municipios que podemos considerar despoblados a partir de **un límite determinado**, creando un índice con todos los municipios con un valor de densidad igual o inferior a este límite, poniendo como valor 0 dicho valor-límite de densidad y 1 la máxima despoblación (esto es, la densidad mínima). Hemos establecido como límite a partir del que podemos considerar un municipio como *despoblado*, el valor de 12,5 habitantes/km2. La referencia para definir este límite es el [DIAGNÓSTICO ESTRATEGIA NACIONAL FRENTE AL RETO DEMOGRÁFICO. EJE DESPOBLACIÓN](https://www.miteco.gob.es/content/dam/miteco/es/reto-demografico/temas/analisis-cartografia/diagnostico_eje_despoblacion_tcm30-517769.pdf){target="_blank"} del Comisionado del Gobierno frente al Reto Demográfico que, en su página 4 incluye, entre los criterios para definir poblaciones en riesgo de despoblación: **Densidad de población menor de 12,5 habitantes por km2**. Los [datos de densidad municipal (2024)](https://bdt.gva.es/bdt/res_optimo_static.php?cons=C0V6449&idioma=cas&form=xlsx){target="_blank"} para construir el indicador se han obtenido del *Banco de Datos Territorial de la GVA*.
+
+<h3>ODS 12</h3>
+
+- **Recogida selectiva de envases ligeros**: Se utiliza el dato en kg/hab./año tal y como lo facilita **ECOEMBES** en su [buscador](https://www.ecoembes.com/es/el-proceso-de-reciclaje/datos-de-reciclaje-de-envases-domestico-en-espana/recogida-selectiva-de-envases-domesticos/barometro){target="_blank"}. Hemos recopilado los datos del buscador en una base de datos.
+- **Recogida selectiva de papel y cartón**: Se utiliza el dato en kg/hab./año tal y como lo facilita **ECOEMBES** en su [buscador](https://www.ecoembes.com/es/el-proceso-de-reciclaje/datos-de-reciclaje-de-envases-domestico-en-espana/recogida-selectiva-de-envases-domesticos/barometro){target="_blank"}. Hemos recopilado los datos del buscador en una base de datos.
+- **Recogida selectiva de vidrio**: El dato se presenta en kg/hab./año, procesando las tres bases de datos provinciales que se descargan de la [página web de **ECOVIDRIO**](https://www.ecovidrio.es/reciclaje/datos-reciclaje){target="_blank"} (hay que seleccionar el año, 2022, la comunidad autónoma y las tres provincias valencianas).
+- **Ecoparques en el municipio**: Se trata de un indicador categórico ("Sí", "No"), que se convierte en entero (1, 0) para el cálculo de los índices los índices. Define la presencia o no de ecoparques en el territorio municipal, independientemente de su número. El dato se ha obtenido recopilando la información del [Buscador de productores y gestores de residuos](https://residuos.gva.es/RES_BUSCAWEB/buscador_residuos_avanzado.aspx?idioma=C){target="_blank"} (Categoría "Ecoparques").
+
+<h3>ODS 13</h3>
+- **Participación en compromisos internacionales por el clima**: El [*Global Covenant of Mayors for Climate and Energy*](https://www.globalcovenantofmayors.org/){target="_blank"} (Pacto Mundial de Alcaldes por el Clima y la Energía - GCoM) es una iniciativa internacional para la acción climática a nivel de ciudad y municipio. El indicador es en este caso categórico ("Sí", "No", participación en el Pacto) y se convierte en entero (1, 0) para el cálculo de los índices. Los datos se obtienen de la [Base de datos de proyectos y firmantes de la UE - 2023](https://jeodpp.jrc.ec.europa.eu/ftp/public/JRC-OpenData/GCOM-MyCovenant/2023_Fourth_release/df1_Signatories_4th%20Release%20-%20March%202023.xlsx){target="_blank"}, procesando la tercera hoja de cálculo.
+
+<h3>ODS 15</h3>
+
+- **Tasa de ocupación de bosques**: Se trata de la tasa en % de la superficie calculada de bosque de especie maderable de lento crecimiento frente a la superficie total del municipio. Los datos de superficie de bosque y de superficie rústica municipal se obtienen de del [Catastro Inmobiliario Rústico](https://www.catastro.hacienda.gob.es/esp/estadistica_10.asp){target="_blank"}: primero hay que bajar las bases de datos (por provincias) de la **superficie municipal rústica** y después bajar la base de datos de % de ocupación por *Especies maderables de crecimiento lento* que suele ser la superficie de bosque clásico (no pastos o prados, no cultivos de maderables rápidas). Estos datos se tienen que combinar con la [base de datos de **superficies totales** de los municipios](https://bdt.gva.es/bdt/){target="_blank"} disponible en el **Banco de datos Territorial de la GVA** (seleccionar *Territori>Características físiques>Densitat de població*).
+- **Espacios naturales protegidos**: es un indicador que cuantifica el número de espacios que cuentan con algún tipo de protección ambiental al interior del municipio. Los datos se obtienen del [Banco de Datos Territorial de la GVA](https://bdt.gva.es/bdt/){target="_blank"} (Medi Ambient > Estadístic d'Espais naturals protegits > Espais segons tipus).
+
+<h3>ODS 16</h3>
+
+- **Tasa de criminalidad general**: es la tasa de los delitos totales registrados, excluyendo los de ciberdelincuencia. La tasa se presenta así:
+$$Indicador=\frac{Casos}{hab.}\times10000$$
+Los datos se obtienen del [Balance trimestral de la criminalidad, 4º trimestre 2024](https://estadisticasdecriminalidad.ses.mir.es/publico/portalestadistico/datos.html?type=pcaxis&path=/DatosBalanceAnt/20244/&file=pcaxis){target="_blank"}, del Ministerio de Interior. Los delitos están clasificados por categorías y cuantificados, **para municipios de más de 20.000 habitantes**.
+- **Tasa de homicidios e intentos de homicidios**: es la tasa de la partida *1. Homicidios dolosos y asesinatos consumados* y *2. Homicidios dolosos y asesinatos en grado tentativa*. La tasa se presenta así:
+$$Indicador=\frac{Casos}{hab.}\times10000$$
+Los datos se obtienen del [Balance trimestral de la criminalidad, 4º trimestre 2024](https://estadisticasdecriminalidad.ses.mir.es/publico/portalestadistico/datos.html?type=pcaxis&path=/DatosBalanceAnt/20244/&file=pcaxis){target="_blank"}, del Ministerio de Interior. Los delitos están clasificados por categorías y cuantificados, **para municipios de más de 20.000 habitantes**.
+
+<h3>ODS 17</h3>
+
+- **Miembros de la Red de Ciudades Educadoras**: Es un indicador categórico de la participación ("Sí", "No") a la **Asociación Internacional de Ciudades Educadoras (AICE)**. Se convierte en entero para calcular los índices integrados. El dato se obtiene recopilando la [página web de la asociación](https://www.edcities.org/listado-de-las-ciudades-asociadas/){target="_blank"}.
+- **Tasa de presupuesto dedicado a Cooperación Internacional**: Es un indicador que se expresa como porcentaje del presupuesto que el ayuntamiento dedica a Cooperación Internacional **frente al Presupuesto de Ingresos Propios del ayuntamiento**.
+Este último aspecto es particularmente delicado y cabe formular algunas consideraciones: **puede haber diferencias y ambigüedades en lo que se refiere al concepto de Ingresos Propios**, por ello es muy importante **definir previamente** como se definen y mantener constante el mismo criterio. Para ello sería bueno disponer un criterio específico para las entidades locales de la CVA. Sin embargo, de momento no lo hemos encontrado. El Fons Valencià per la Solidaritat ha publicado el estudio "*La cooperació al desenvolupament en l’esfera local des del Fons Valencià per la Solidaritat i les entitats sòcies*", sin embargo no toca este aspecto. Para ello, nos basaremos pues en el criterio recomendado por Joaquim Solé (Universitat de Barcelona) en el documento [CRITERIS D’APLICACIÓ DEL 0’7% DELS INGRESSOS PROPIS MUNICIPALS A LA COOPERACIÓ AL DESENVOLUPAMENT. JUSTIFICACIÓ TÈCNICA](https://www.fonscatala.org/upload/archivos/20170214_0709JUSTIFICACIO_07_INGRESSOS_MUNICIPALS.pdf){target="_blank"}, publicado por Fons Català de Cooperació al Desnevolupament. Este documento considera lo siguiente (pág. 10): *En resumen, a efectos de la aportación del 0,7%, deben considerarse ingresos propios todos los impuestos directos (cap. 1), los impuestos indirectos (cap. 2), las tasas, los precios públicos y las contribuciones especiales y las cuotas de urbanización (cap. 3, excepto los reintegros) y los ingresos patrimoniales, incluidos los beneficios de empresas y cañones de concesiones (cap. 5) del presupuesto liquidado y consolidado de ingresos. Quedan excluidos del cálculo del 0,7% los reintegros y otros ingresos (art. 38) y las tasas o precios por transporte urbano (conc. 345) y por abastecimiento de agua a domicilio (conc. 300)*.
+Esto es: Iingresos Propios: $IP$
+$$IP=Cap1 + Cap2+ Cap 3 + Cap5 - Art38-Conc300-Conc345$$
+Importante: estas cantidades deben considerarse a partir de las **liquidaciones consolidadas de ingresos**, **importes reconocidos**.
+Definido el criterio, cabe destacar que los importes destinados a Cooperación se han obtenido de una base de dado facilitada directamente por el **Fons Valencià per la Solidaritat** y por recopilación de datos de la [Federación Española de Municipios y Provincias - FEMP](http://cooperacion.femp.es/){target="_blank"}. En cambio las fuentes de datos de las liquidaciones municipales son las ya descritas para los ODS 1 y ODS 4: el portal [CONPREL: CONSULTA PRESUPUESTOS Y LIQUIDACIONES DE EELL](https://serviciostelematicosext.hacienda.gob.es/SGFAL/CONPREL){target="_blank"} (hay que marcar el año y si se quieren presupuestos o liquidaciones. El portal facilita un base de datos en *Access* de la que hemos extraído los datos en formato texto para su posterior procesamiento.
+Como último apunte destacar que **los porcentajes calculados por el Fons Valencà per la Solidaritat son ligeramente diferentes de los nuestros** por el hecho que **nuestro método de cálculo** del denominador del porcentaje, esto es, los **Ingresos Propios Municipales, es probablemente diferente**. En futuro habrá que considerar la posibilidad de **uniformar criterios con el FVS** en este sentido.
+
+<h3>Panel de índices integrados por ODS</h3>
+Cada indicador se ha normalizado para su agregación en una tabla de resultados agrupados. Los indicadores se **normalizan** utilizando el **método de mínimo y máximo**, siguiendo la fórmula:
+$X_i=\frac{x_i-x_{min}}{x_{max}-x_{min}}$ para los indicadores que van en la misma dirección del ODS (por ejemplo, Tasa de Recogida de Envases Ligeros), y la fórmula: $X_i=\frac{x_{max}-x_i}{x_{max}-x_{min}}$, para los que van en dirección contraria (por ejemplo, Tasa de Pobreza Severa).
+
+La función del Panel es **facilitar la visualización *sinóptica* de los indicadores en estudio**, pero **no tiene valor científico**. Este tipo de operaciones de integración de indicadores para generar índices compuestos, están muy *de moda* hoy en día, pero **pueden ser imprecisas y sesgadas**, si son incompletas las dimensiones que operativizan el concepto, como sería en nuestro caso (hemos utilizado las dimensiones que hemos podido encontrar, no todas las que serían necesarias).
+
+Por ello, no hemos realizado ponderaciones dentro de cada índice compuesto, ni hemos separado categorías de municipios dentro del panel, ni hemos establecido umbrales para eliminar valores atípicos. Todas estas operaciones serían necesarias en el caso que se quisieran establecer (sobre todos los ODS, o algunos de ellos) unos índices de valor científico (para ello, sería necesario disponer de unos indicadores que cubrieran las todas las principales dimensiones del ODS, que, por lo general, son muchas).
+
+
+
+
+

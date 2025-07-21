@@ -1,0 +1,52 @@
+---
+title: "<img src=\"CR-ES-Horizontal-CMYK_page-164-53.jpg\" style=\"vertical-align: top; width:50%; height: auto; \"/> <br> <br> <br> <br> <br> Bibliografia para la elaboración de los indicadores municipales sobre ODS en la CVA"
+output:
+  prettydoc::html_pretty:
+    theme: leonids
+---
+<style>
+.cover{
+    background-color: white;
+    }
+    
+.cover-card .author_name {
+    color: #c42027;
+    font-weight: bolder;
+    font-size: 1.8em;
+    
+}
+</style>
+
+```{r include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(cache = FALSE)
+```
+
+
+<h3><b>Bibliografía general</b></h3>
+- La página web [Indicadores de la Agenda 2030 para el Desarrollo Sostenible](https://www.ine.es/dyngs/ODS/es/index.htm){target="_blank"} del Instituto Nacional de Estadística.
+- [Sisto, R., Benayas, J., 2021. *Los municipios de la Comunidad de Madrid y la Agenda 2030. Diagnóstico sobre su grado de aplicación*. INAECU y REDS / SDSN-SPAIN](https://reds-sdsn.es/ods-madrid/){target="_blank"} de la Red Española de Desarrollo Sostenible (REDS).
+- [REDS, 2020. *Los ODS en 100 ciudades españolas (2ª edición)*](https://reds-sdsn.es/informe-ods-ciudades-2020/){target="_blank"}.
+
+<h3><b>Bibliografía específica</b></h3>
+
+<h3>ODS 1</h3>
+[III Informe 2022. *El mapa de la pobreza severa en España*. Abandonadas, EAPN España, 2022](https://www.eapn.es/ARCHIVO/documentos/noticias/1671549839_2022-abandonadas.-la-pobreza-severa-en-espaa.pdf){target="_blank"}.
+
+<h3>ODS 7</h3>
+- [*Informe de Indicadores de Pobreza Energética en España*, Escuela Técnica Superior de Ingeniería (ICAI) Universidad Pontificia Comillas, 2022](https://www.comillas.edu/noticias/la-pobreza-energetica-siguio-creciendo-en-espana-en-2022/#:~:text=El%20Informe%20de%20Indicadores%20de,temperatura%20adecuada%20en%20sus%20hogares.){target="_blank"}.
+- [Sujar Cost A., Analisis geoespacial de la distribución de la pobreza energética del sector residencial de la comunidad valenciana, 2022](https://riunet.upv.es/handle/10251/185142?show=full){target="_blank"}.
+- [L.Desvallées, *Identificación, localización i caracterización de la vulnerabilidad energética a nivel de sección censal en el municipio de Barcelona*, Scripta Nova, 2021](https://revistes.ub.edu/index.php/ScriptaNova/article/view/30257){target="_blank"}.
+- AAVV, *Pobreza energética en la Comunitat Valenciana*, Institut valencià de l'Edificació, 2022.
+
+<h3>ODS 11</h3>
+- [*WHO global air quality guidelines*, World Health Organization, 2021](https://www.who.int/publications/i/item/9789240034228){target="_blank"}.
+- [Diagnóstico estrategia nacional frente al reto demográfico. Eje despoblación, 2020](https://www.miteco.gob.es/content/dam/miteco/es/reto-demografico/temas/analisis-cartografia/diagnostico_eje_despoblacion_tcm30-517769.pdf){target="_blank"}.
+
+
+<h3>ODS 17</h3>
+[Joaquim Solé Vilanova, Criteris d’aplicació del 0’7% dels ingressos propis municipals a la cooperació al desenvolupament. Justificació tècnica, Fons Català de Cooperació al Desenvolupament, 2016 ](https://www.fonscatala.org/ca/comunicacio/recursos/justificacio-tecnica-de-laplicacio-del-07-en-cooperacio){target="_blank"}.
+
+
