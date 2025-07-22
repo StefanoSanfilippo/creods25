@@ -1,0 +1,291 @@
+---
+title: "ECOEMBES Scrape"
+author: "Stefano Sanfilippo"
+date: "2024-03-12"
+output: html_document
+---
+
+
+
+```{r}
+library(dplyr)
+library(stringr)
+library(rvest)
+library(RSelenium)
+library(wdman)
+library(netstat)
+
+```
+
+
+```{r}
+
+# Connect to Selenium
+driver_object <- rsDriver(browser = "firefox",
+                          chromever=NULL,
+                          verbose = FALSE,
+                          port = free_port())
+Sys.sleep(5)
+remDr <- driver_object$client
+# OBRIR
+remDr$open()
+Sys.sleep(5)
+urlManVal <- 'https://www.ecoembes.com/es/el-proceso-de-reciclaje/datos-de-reciclaje-de-envases-domestico-en-espana/recogida-selectiva-de-envases-domesticos/barometro'
+
+
+```
+
+```{r}
+
+# SCRAPING ECOEMBES ALACANT
+
+# IMPORTANTE: EJECUTAR POR SEPARADO
+
+# Navega hasta la página
+remDr$navigate(urlManVal)   
+Sys.sleep(5)
+
+# Hay un frame que hay que alcanzar
+frames <- remDr$findElements("css", "iframe")
+remDr$switchToFrame(frames[[1]])
+
+# XPath CVA
+xpath <- '/html/body/div[3]/div[2]/div[1]/p/select[1]/option[12]'
+#alxpath <- '//*[@id="provinciainputrecogida"]/option[1]'
+#xpath2022 <- '//*[@id="2022"]'
+cva <- remDr$findElement(using = 'xpath', xpath)
+Sys.sleep(2)
+
+# XPath selector municipio
+ajxpath <- '//*[@id="municipiobuscador"]/option'
+
+lista <- list()
+i <-2
+
+for (i in 2:142) {
+# Clica dropdown CCAA
+cva$clickElement()
+Sys.sleep(5) 
+
+# Encuentra dropdown municipio
+ajunt <- remDr$findElements(using = 'xpath', ajxpath)
+Sys.sleep(5) 
+
+# Clica dropdown municipio
+ajunt[[i]]$clickElement()
+Sys.sleep(5)
+
+lista[[i]] <- remDr$getPageSource()[[1]] %>% 
+    read_html() |> 
+    html_element(css= 'body > div.main-content > div.container.fichamaparecogida > div > div.col-xs-12.col-sm-5.recogida-localidad') |> 
+    html_text2() |> 
+    str_split("\n") |> 
+    unlist() |> 
+    magrittr::extract(.=c(1,17,25)) |> 
+    matrix(nrow=1,byrow=TRUE) |> 
+    as.data.frame() |> 
+    mutate(V2= str_remove(V2," /kg/habitante/año"),
+           V3= str_remove(V3," /kg/habitante/año"),
+           V2= as.numeric(sub(",", "\\.", V2)),
+           V3= as.numeric(sub(",", "\\.", V3))) |> 
+    rename(Municipio= V1,
+           Envases.Lig= V2,
+           Papel.Cart= V3)
+}
+
+
+ecoembesAl <- lista |> 
+    bind_rows()
+
+writexl::write_xlsx(ecoembesAl, "ecoembesAl.xlsx")   
+
+```
+
+```{r}
+
+# SCRAPING ECOEMBES VALENCIA
+
+# IMPORTANTE: EJECUTAR POR SEPARADO
+
+# Navega hasta la página
+remDr$navigate(urlManVal)   
+Sys.sleep(5)
+
+# Hay un frame que hay que alcanzar
+frames <- remDr$findElements("css", "iframe")
+remDr$switchToFrame(frames[[1]])
+
+# XPath CVA
+xpath <- '/html/body/div[3]/div[2]/div[1]/p/select[1]/option[12]' # CVA
+cva <- remDr$findElement(using = 'xpath', xpath)
+Sys.sleep(2)
+
+#Hay un frame que hay que alcanzar
+#frames <- remDr$findElements("css", "iframe")
+#remDr$switchToFrame(frames[[1]])
+
+# xpath Provincia
+#alxpath <- '//*[@id="provinciainputrecogida"]/option[1]' # CASTELLÓ
+valxpath <- '/html/body/div[3]/div[3]/div/div[3]/p[3]/select/option[3]'
+
+# Castello: /html/body/div[3]/div[2]/div[1]/p/select[2]/option[2]
+# Valencia: /html/body/div[3]/div[2]/div[1]/p/select[2]/option[3]
+
+#cas <- remDr$findElement(using = 'xpath', casxpath)
+
+
+# XPath selector municipio
+ajxpath <- '//*[@id="municipiobuscador"]/option'
+
+lista <- list()
+i <-2
+
+for (i in 2:262) {
+
+    # Clica dropdown CCAA
+cva$clickElement()
+Sys.sleep(5)
+# Dropdown Castelló
+val <- remDr$findElement(using = 'xpath', valxpath)
+Sys.sleep(5)
+val$clickElement()
+Sys.sleep(4)
+
+# Encuentra dropdown municipio
+ajunt <- remDr$findElements(using = 'xpath', ajxpath)
+Sys.sleep(5) 
+
+# Clica dropdown municipio
+ajunt[[i]]$clickElement()
+Sys.sleep(5)
+
+lista[[i]] <- remDr$getPageSource()[[1]] %>% 
+    read_html() |> 
+    html_element(css= 'body > div.main-content > div.container.fichamaparecogida > div > div.col-xs-12.col-sm-5.recogida-localidad') |> 
+    html_text2() |> 
+    str_split("\n") |> 
+    unlist() |> 
+    magrittr::extract(.=c(1,17,25)) |> 
+    matrix(nrow=1,byrow=TRUE) |> 
+    as.data.frame() |> 
+    mutate(V2= str_remove(V2," /kg/habitante/año"),
+           V3= str_remove(V3," /kg/habitante/año"),
+           V2= as.numeric(sub(",", "\\.", V2)),
+           V3= as.numeric(sub(",", "\\.", V3))) |> 
+    rename(Municipio= V1,
+           Envases.Lig= V2,
+           Papel.Cart= V3)
+}
+
+
+ECOEMBESVal <- lista |> 
+    bind_rows()
+
+writexl::write_xlsx(ECOEMBESVal, "ecoembesVal.xlsx")
+
+```
+
+
+
+```{r}
+
+# SCRAPING ECOEMBES CASTELLÓ
+
+# IMPORTANTE: EJECUTAR POR SEPARADO
+
+# Navega hasta la página
+remDr$navigate(urlManVal)   
+Sys.sleep(5)
+
+# Hay un frame que hay que alcanzar
+frames <- remDr$findElements("css", "iframe")
+remDr$switchToFrame(frames[[1]])
+
+# XPath CVA
+xpath <- '/html/body/div[3]/div[2]/div[1]/p/select[1]/option[12]' # CVA
+cva <- remDr$findElement(using = 'xpath', xpath)
+Sys.sleep(2)
+
+#Hay un frame que hay que alcanzar
+#frames <- remDr$findElements("css", "iframe")
+#remDr$switchToFrame(frames[[1]])
+
+# xpath Provincia
+#alxpath <- '//*[@id="provinciainputrecogida"]/option[1]' # CASTELLÓ
+casxpath <- '/html/body/div[3]/div[3]/div/div[3]/p[3]/select/option[2]'
+
+#cas <- remDr$findElement(using = 'xpath', casxpath)
+
+
+# XPath selector municipio
+ajxpath <- '//*[@id="municipiobuscador"]/option'
+
+lista <- list()
+i <-2
+
+for (i in 2:135) {
+
+    # Clica dropdown CCAA
+cva$clickElement()
+Sys.sleep(5)
+# Dropdown Castelló
+cas <- remDr$findElement(using = 'xpath', casxpath)
+Sys.sleep(5)
+cas$clickElement()
+Sys.sleep(5)
+
+# Encuentra dropdown municipio
+ajunt <- remDr$findElements(using = 'xpath', ajxpath)
+Sys.sleep(5) 
+
+# Clica dropdown municipio
+ajunt[[i]]$clickElement()
+Sys.sleep(5)
+
+lista[[i]] <- remDr$getPageSource()[[1]] %>% 
+    read_html() |> 
+    html_element(css= 'body > div.main-content > div.container.fichamaparecogida > div > div.col-xs-12.col-sm-5.recogida-localidad') |> 
+    html_text2() |> 
+    str_split("\n") |> 
+    unlist() |> 
+    magrittr::extract(.=c(1,17,25)) |> 
+    matrix(nrow=1,byrow=TRUE) |> 
+    as.data.frame() |> 
+    mutate(V2= str_remove(V2," /kg/habitante/año"),
+           V3= str_remove(V3," /kg/habitante/año"),
+           V2= as.numeric(sub(",", "\\.", V2)),
+           V3= as.numeric(sub(",", "\\.", V3))) |> 
+    rename(Municipio= V1,
+           Envases.Lig= V2,
+           Papel.Cart= V3)
+}
+
+
+ECOEMBESCas <- lista |> 
+    bind_rows()
+
+writexl::write_xlsx(ECOEMBESCas, "ecoembesCas.xlsx")
+
+
+
+
+```
+
+
+
+
+
+
+
+```{r}
+remDr$close()
+remDr$closeServer()
+
+
+
+```
+
+
+
+
+
