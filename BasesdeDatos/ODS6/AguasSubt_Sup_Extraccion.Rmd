@@ -1,0 +1,203 @@
+---
+title: "Extracción datos Municipios Vulnerables Aguas Superficiales y Subterraneas"
+author: "Stefano Sanfilippo"
+date: "2024-03-07"
+output: html_document
+---
+
+
+```{r}
+
+library(readxl)
+library(stringr)
+library(dplyr)
+
+
+
+```
+
+```{r}
+# Extracción municipios vulnerables por nitratos en aguas SUPERFICIALES
+# de "Municipios vulnerables_MASuperf conv.xls" documento convertido previamente de .pdf a .xls con el programa PDF X (externo a R)
+
+#Extracción nombres municipios hoja 1
+sup1 <- read_xls("Municipios vulnerables_MASuperf conv.xls",
+         sheet = 1,
+         skip = 11) |> 
+    select(4) |> 
+    rename(nomBrut= ...4)
+
+#Extracción nombres municipios hoja 2
+sup2 <- read_xls("Municipios vulnerables_MASuperf conv.xls",
+         sheet = 2) |> 
+    select(4) |> 
+    rename(nomBrut= ...4)
+
+#Extracción nombres municipios hoja3
+sup3 <- read_xls("Municipios vulnerables_MASuperf conv.xls",
+         sheet = 3,
+         col_names = FALSE) |> 
+    select(4) |> 
+    rename(nomBrut= ...4)
+
+listMunSup <- rbind(sup1,sup2,sup3) |> 
+    mutate(nomBrut= gsub("\n", " ", nomBrut)) |> 
+    filter(!is.na(nomBrut)) |> as.list()
+
+# Listado depurado de municipios afectados por contaminación de nitratos en aguas superficiales
+AgSupListado <- unique(unname(unlist(lapply(listMunSup, function(x) strsplit(x, ", ")))))
+
+AguasSup <- tibble(AgSupListado) |> rename(AguasSuperf= AgSupListado)
+    
+
+```
+
+
+```{r}
+# Extracción municipios vulnerables por nitratos en aguas SUBTERRÁNEAS
+# de "Municipios vulnerables_MASubt conv.xls" documento convertido previamente de .pdf a .xls
+
+
+#Extracción nombres municipios hoja 1
+sub1 <- read_xls("Municipios vulnerables_MASubt conv.xls",
+         sheet = 1,
+         skip = 9) |> 
+    select(3) |> 
+    rename(nomBrut= `Termes municipals / Términos municipales`)
+
+#Extracción nombres municipios hoja 2
+sub2 <- read_xls("Municipios vulnerables_MASubt conv.xls",
+         sheet =2,
+         col_names = FALSE,
+         skip = 0) |> 
+    select(3) |> 
+    rename(nomBrut= ...3)
+
+#Extracción nombres municipios hoja3
+sub3 <- read_xls("Municipios vulnerables_MASubt conv.xls",
+         sheet =3,
+         col_names = FALSE,
+         skip = 0) |> 
+    select(3) |> 
+    rename(nomBrut= ...3)
+
+#Extracción nombres municipios hoja4
+sub4 <- read_xls("Municipios vulnerables_MASubt conv.xls",
+         sheet =4,
+         col_names = FALSE,
+         skip = 0) |> 
+    select(3) |> 
+    rename(nomBrut= ...3)
+
+#Extracción nombres municipios hoja5
+sub5 <- read_xls("Municipios vulnerables_MASubt conv.xls",
+         sheet =6,
+         col_names = FALSE,
+         skip = 0) |> 
+    select(3) |> 
+    rename(nomBrut= ...3)
+
+
+#Extracción nombres municipios hoja6
+sub6 <- read_xls("Municipios vulnerables_MASubt conv.xls",
+         sheet =5,
+         col_names = FALSE,
+         skip = 0) |> 
+    select(3) |> 
+    rename(nomBrut= ...3)
+
+listMunSub <- rbind(sub1,sub2,sub3,sub4,sub5,sub6) |> 
+    mutate(nomBrut= gsub("\n", ", ", nomBrut),
+           nomBrut= gsub(" / ", "/",nomBrut),
+           nomBrut= gsub("/ ", "/",nomBrut),
+           nomBrut= gsub(", les", " les", nomBrut),
+           nomBrut= gsub(", el", " el", nomBrut)) |> 
+    filter(!is.na(nomBrut)) |>
+    filter(!grepl("Termes municipals", nomBrut)) |> 
+    as.list()
+
+# Listado depurado de municipios afectados por contaminación de nitratos en aguas superficiales
+AgSubListado <- unique(unname(unlist(lapply(listMunSub, function(x) strsplit(x, ", ")))))
+
+AguasSub <- tibble(AgSubListado) |> rename(AguasSubterr= AgSubListado)
+
+
+```
+
+
+```{r}
+# Extracción municipios vulnerables por nitratos en aguas SUBTERRÁNEAS (Ampliación)
+# de "Municipios vulnerables_ampliacio conv.xls" documento convertido previamente de .pdf a .xls
+
+sub7 <- read_xls("Municipios vulnerables_ampliacio conv.xls",
+         sheet = 3,
+         range = "AF21:AF45",
+         col_names = FALSE) |> 
+    rename(nomBrut= ...1)
+
+listMunSub2 <-  sub7 |> mutate(nomBrut= gsub("\n", ", ", nomBrut),
+           nomBrut= gsub(" / ", "/",nomBrut),
+           nomBrut= gsub("/ ", "/", nomBrut),
+           nomBrut= gsub(", les", " les", nomBrut),
+           nomBrut= gsub(", el", " el", nomBrut)) |>
+    filter(!is.na(nomBrut)) |>
+    filter(!grepl("Termes municipals", nomBrut)) |> 
+    as.list()
+
+# Listado depurado de municipios afectados por contaminación de nitratos en aguas superficiales
+AgSubListado2 <- unique(unname(unlist(lapply(listMunSub2, function(x) strsplit(x, ", ")))))
+
+AguasSub2 <- tibble(AgSubListado2) |> rename(AguasSubterr= AgSubListado2)
+
+AguasSub <- rbind(AguasSub, AguasSub2)
+
+# Extracción municipios vulnerables por nitratos en aguas SUPERFICIALES (Ampliación)
+# de "Municipios vulnerables_ampliacio conv.xls" documento convertido previamente de .pdf a .xls
+
+sup4 <- read_xls("Municipios vulnerables_ampliacio conv.xls",
+         sheet = 3,
+         range = "AN59:AN65",
+         col_names = FALSE) |> 
+    rename(nomBrut= ...1)
+
+#Extracción nombres municipios hoja 2
+sup5 <- read_xls("Municipios vulnerables_ampliacio conv.xls",
+         sheet = 4,
+         col_names = FALSE) |> 
+    select(4) |> 
+    rename(nomBrut= ...4)
+
+listMunSup2 <- rbind(sup4,sup5) |> 
+    mutate(nomBrut= gsub("\n", " ", nomBrut),
+           nomBrut= gsub("/ ", "/", nomBrut)) |> 
+    filter(!is.na(nomBrut)) |> as.list()
+
+# Listado depurado de municipios afectados por contaminación de nitratos en aguas superficiales
+AgSupListado2 <- trimws(unique(unname(unlist(lapply(listMunSup2, function(x) strsplit(x, '[,;]+'))))), 'both')
+
+AguasSup2 <- tibble(AgSupListado2) |> rename(AguasSuperf= AgSupListado2)
+
+AguasSup <- rbind(AguasSup,AguasSup2)
+
+```
+
+
+
+```{r}
+
+writexl::write_xlsx(AguasSub, "AguasSubterraneas.xlsx")
+
+writexl::write_xlsx(AguasSup, "AguasSuperficiales.xlsx")
+
+
+
+
+```
+
+
+
+
+
+
+
+
