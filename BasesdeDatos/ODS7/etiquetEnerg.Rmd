@@ -1,0 +1,244 @@
+---
+title: "Datos eficiencia energética viviendas"
+author: "Stefano Sanfilippo"
+date: "2024-02-15"
+output: html_document
+---
+
+
+```{r}
+library(dplyr)
+library(stringr)
+library(httr)
+
+```
+
+
+```{r}
+# Datos extraidos del sitio web de datos abiertos de IVACE
+# https://gceedadesobertes.aven.es/dadesobertes/
+
+
+#=====================================================
+# EXTRACCIÓN DATOS ITERANDO LOS AÑOS ENTRE 2015 Y 2024
+#=====================================================
+
+# Vamos a extraer lodos los datos contenidos en ficheros csv que contienen datos de certificados energéticos válidos (validez 5 o 10 años) en 2025
+
+var <- 2015:2024 # El AÑO es lo único que varía en los links junto a la PROVINCIA. 
+
+#--------------------
+# ALICANTE
+#--------------------
+
+# Para Alicante, se fusionan tres fragmentos de link de manera que se va a crear un link diferente para cada año.
+
+urlsAl <- paste0(
+  "https://gceedadesobertes.aven.es/dadesobertes/Home/GetFile?anyo=",
+  var,
+  "&provincia=ALICANTE&tipo=ETIQUETA&formato=csv"
+)
+
+# Función para iterar sobre la misma página (Alicante)
+al_data <- lapply(urlsAl, function(x) {
+    GET(x, write_disk(tf1 <- tempfile(fileext = ".csv")))
+    dfAl <- read.csv(tf1,
+                 sep = ";")
+})
+
+al_data <- bind_rows(al_data)
+
+
+al_data <- al_data |> 
+    select(1,2,3,7,9,11,12) |> 
+    mutate(CODIGO_POSTAL= as.character(CODIGO_POSTAL),
+           CODIGO_POSTAL= str_pad(CODIGO_POSTAL,
+                                  width= 5, side = 'left', pad = '0'),
+           anyo_valid= as.integer(str_sub(VALIDO_HASTA, 7,10))
+           ) %>% 
+    select(-3) %>% 
+    filter(anyo_valid > 2024)
+
+
+#--------------------
+# CASTELLÓ
+#--------------------
+
+# Se fusionan tres fragmentos de link de manera que se va a crear un link diferente para cada año.
+
+urlsCas <- paste0(
+  "https://gceedadesobertes.aven.es/dadesobertes/Home/GetFile?anyo=",
+  var,
+  "&provincia=CASTELL%C3%93N&tipo=ETIQUETA&formato=csv"
+)
+
+cas_data <- lapply(urlsCas, function(x){
+    GET(x, write_disk(tf2 <- tempfile(fileext = ".csv")))
+    dfCas <- read.csv(tf2,
+                 sep = ";")
+})
+
+cas_data <- bind_rows(cas_data)
+
+cas_data <- cas_data |> 
+    select(1,2,3,7,9,11,12) |> 
+    mutate(CODIGO_POSTAL= as.character(CODIGO_POSTAL),
+           CODIGO_POSTAL= str_pad(CODIGO_POSTAL,
+                                  width= 5, side = 'left', pad = '0'),
+           anyo_valid= as.integer(str_sub(VALIDO_HASTA, 7,10))
+           ) %>% 
+    select(-3) %>% 
+    filter(anyo_valid > 2024)
+
+
+#--------------------
+# VALENCIA
+#--------------------
+
+# Se fusionan tres fragmentos de link de manera que se va a crear un link diferente para cada año.
+
+urlsVal <- paste0(
+  "https://gceedadesobertes.aven.es/dadesobertes/Home/GetFile?anyo=",
+  var,
+  "&provincia=VALENCIA&tipo=ETIQUETA&formato=csv"
+)
+
+val_data <- lapply(urlsVal, function(x) {
+    GET(x, write_disk(tf3 <- tempfile(fileext = ".csv")))
+    dfVal <- read.csv(tf3,
+                 sep = ";")
+})
+
+val_data <- bind_rows(val_data)
+
+val_data <- val_data |> 
+    select(1,2,3,7,9,11,12) |> 
+    mutate(CODIGO_POSTAL= as.character(CODIGO_POSTAL),
+           CODIGO_POSTAL= str_pad(CODIGO_POSTAL,
+                                  width= 5, side = 'left', pad = '0'),
+           anyo_valid= as.integer(str_sub(VALIDO_HASTA, 7,10))
+           ) %>% 
+    select(-3) %>% 
+    filter(anyo_valid > 2024)
+
+dfEfEner <- rbind(al_data,cas_data,val_data) %>% 
+    filter(CONSUMO_EP_LETRA != "")
+
+EficEner <- dfEfEner |> 
+    mutate(MUNICIPIO= case_when(MUNICIPIO== "CASTELLÓN"~ "castello", # Coincide con el cp 46270
+                                MUNICIPIO== "CASTELLÓN DE LA PLANA/CASTELLÓ DE LA PLANA"~
+                                    "castello de la plana",
+                                .default = as.character(MUNICIPIO))) |> 
+    group_by(MUNICIPIO, CONSUMO_EP_LETRA) |> # A~ Máxima eficiencia; G~ Mínima eficiencia
+    mutate(totLetra=n()) |> # Añade a cada expediente el total de cada letra por municipio
+    ungroup() |> 
+    group_by(MUNICIPIO) |> 
+    mutate(totMunicipio= n(), # Añade a cada exp. el dato del total de expedientes por cada municipio
+           tasa= round(totLetra/totMunicipio*100,1)) |>  # Añade el % de cada letra por Municipio
+    distinct(MUNICIPIO,CONSUMO_EP_LETRA,totLetra,totMunicipio, tasa) |> 
+    arrange(MUNICIPIO, CONSUMO_EP_LETRA) # TOTAL DE CERTIFICADOS POR MUNICIPIO Y LETRA
+    
+writexl::write_xlsx(EficEner, "eficienciaEnerg.xlsx")
+
+
+
+```
+
+```{r}
+
+# Cálculo Medias consumo energético (kWh/m2 año): prueba como alternativa al anterior
+consAl <- dfAl |> group_by(MUNICIPIO) |> summarise(ConsumoTotal= sum(CONSUMO_EP_VALOR),
+                                         ConsumoMedio= mean(CONSUMO_EP_VALOR),
+                                         n=n())
+consCas <- dfCas |> group_by(MUNICIPIO) |> summarise(ConsumoTotal= sum(CONSUMO_EP_VALOR),
+                                         ConsumoMedio= mean(CONSUMO_EP_VALOR),
+                                         n=n())
+consVal <- dfVal |> group_by(MUNICIPIO) |> summarise(ConsumoTotal= sum(CONSUMO_EP_VALOR),
+                                         ConsumoMedio= mean(CONSUMO_EP_VALOR),
+                                         n=n())
+
+consumCVA <- rbind(consAl,consCas, consVal) |> 
+    rename(Municipio= MUNICIPIO)
+
+
+```
+
+```{r}
+
+munClean <- readxl::read_xlsx("munClean.xlsx")
+
+DatosConsumClean <- consumCVA |> 
+    mutate(Municipio= tolower(Municipio),
+           Municipio= stringi::stri_trans_general(Municipio, "Latin-ASCII"),
+           Municipio= sub("^l'(.*)", "\\1 l'", Municipio),
+           Municipio= gsub("'", "", Municipio),
+           Municipio= gsub("`", "", Municipio),
+           Municipio= gsub("´","", Municipio),
+           Municipio= gsub(",", "", Municipio),
+           Municipio= gsub("\\(", "", Municipio),
+           Municipio= gsub(")", "", Municipio),
+           Municipio= sub("^la (.*)", "\\1 la", Municipio),
+           Municipio= sub("^el (.*)", "\\1 el", Municipio),
+           Municipio= sub("^les (.*)", "\\1 les", Municipio),
+           Municipio= sub("^los (.*)", "\\1 los", Municipio),
+           Municipio= trimws(Municipio, "both")) |> 
+    mutate(Municipio= case_when(Municipio== "alboraya"~ "alboraia/alboraya",
+                                Municipio== "alcocer de planes"~ "alcosser",
+                                Municipio== "alfarp"~ "alfarb",
+                                Municipio== "algimia de alfara"~ "algimia dalfara",
+                                Municipio== "almazora/almassora"~ "almassora",
+                                Municipio== "alquerias del nino perdido"~ 
+                                    "alqueries les/alquerias del nino perdido",
+                                Municipio== "ares del maestre"~ "ares del maestrat",
+                                Municipio== "benasal"~ "benassal",
+                                Municipio== "benisano"~ "benissano",
+                                Municipio== "benisuera"~ "benissuera",
+                                Municipio== "benlloch"~ "benlloc",
+                                Municipio== "burriana"~ "borriana/burriana",
+                                Municipio== "calpe/calp"~ "calp",
+                                Municipio== "castellon de la plana/castello de la plana"~
+                                    "castello de la plana",
+                                Municipio== "adsubia"~ "atzubia l",
+                                Municipio== "castellon"~ "castello",
+                                Municipio== "chert/xert"~ "xert",
+                                Municipio== "el castell de guadalest"~ "castell de guadalest el",
+                                Municipio== "facheca"~ "fageca",
+                                Municipio== "genoves"~ "genoves el",
+                                Municipio== "guadasequies"~ "guadassequies",
+                                Municipio== "herbes"~ "herbers",
+                                Municipio== "hondon de las nieves"~ 
+                                    "fondo de les neus el/hondon de las nieves",
+                                Municipio== "jalon/xalo"~ "xalo",
+                                Municipio== "lucena del cid"~ "llucena/lucena del cid",
+                                Municipio== "lugar nuevo de la corona"~ "llocnou de la corona",
+                                Municipio== "monserrat"~ "montserrat",
+                                Municipio== "montroy"~ "montroi/montroy",
+                                Municipio== "naquera"~ "naquera/naquera",
+                                Municipio== "masalaves"~ "massalaves",
+                                Municipio== "novele/novetle"~ "novetle",
+                                Municipio== "peniscola"~ "peniscola/peniscola",
+                                Municipio== "puig"~ "puig de santa maria el",
+                                Municipio== "rafelbunol/rafelbunyol"~ "rafelbunyol",
+                                Municipio== "real de gandia"~ "real de gandia el",
+                                Municipio== "real de montroi"~ "real",
+                                Municipio== "san juan de enova"~ "sant joanet",
+                                Municipio== "torre endomenech"~ "torre den domenec la",
+                                Municipio== "vall de ebo"~ "vall debo la",
+                                Municipio== "vall de gallinera"~ "vall de gallinerala",
+                                Municipio== "villalonga"~ "vilallonga/villalonga",
+                                Municipio== "villarreal/vila-real"~ "vila-real",
+                                Municipio== "vistabella del maestrazgo"~ "vistabella del maestrat",
+                                Municipio== "pinoso"~ "pinos el/pinoso",
+                                .default = as.character(Municipio)))
+
+ConsEnerMedio <- DatosConsumClean |> 
+    left_join(munClean, by= 'Municipio') |> 
+    select(5,1:4)
+
+# writexl::write_xlsx(ConsEnerMedio, "ConsEnerMedio.xlsx")
+
+```
+
+
+
+

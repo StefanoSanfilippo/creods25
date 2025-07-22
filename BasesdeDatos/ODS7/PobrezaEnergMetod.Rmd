@@ -1,0 +1,183 @@
+---
+title: "ODS 7 - Índice de pobreza energética"
+author: "Stefano Sanfilippo"
+date: "2024-02-17"
+output: html_document
+---
+
+
+```{r include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(cache = FALSE)
+```
+
+
+
+```{r}
+
+library(dplyr)
+library(ggplot2)
+library(corrplot)
+
+```
+
+Se utilizan datos municipales de pobreza del Instituto Nacional de Estadística (INE), datos municipales del estado y la época de construcción de las viviendas del censo de 2011 y datos municipales de IVACE sobre el aislamiento energético/eficiencia energética de las viviendas que han obtenido etiqueta. En este caso, tenemos dos variables también: una que mide la cantidad de viviendas certificadas como "G", esto es ineficientes energéticamente, y por otro lado el consumo medio (en Kwh/m2 año) certificado de las viviendas del municipio.
+
+El objetivos es establecer qué tipo de correlación tienen estas variables entre si e identificar cuáles se pueden utilizar para calcular un indicador del nivel de riesgo de vulnerabilidad energética para los municipios de la Comunitat Valenciana.
+
+```{r }
+
+pobr <- readxl::read_xlsx("pobreza.xlsx") # Datos de pobreza INE (veure ODS 1)
+ods7.EstViv <- readxl::read_xlsx("VivienDeficEstruct.xlsx") # Datos de viviendas con deficiencias estructurales (INE 2011)
+ods7.EfEn <- readxl::read_xlsx("bajaEficEn.xlsx") # Viviendas con bajo aislamiento. Se obtiene del procesamiento que hace el documento principal (ODS_Valencia_new2.Rmd)
+consEnerMedio <- readxl::read_xlsx("ConsEnerMedio.xlsx")
+
+# a= Indice de viviendas con carencias estructurales (ods7.tasaDeficien)
+# b= Indice de viviendas con aislamiento carente (ods7.tasaLetraG)
+# c= Indice de riesgo de pobreza (ods1.Pobr)
+
+# CÁLCULO ÍNDICES
+
+
+a <- ods7.EstViv |> 
+    mutate(ods7.IndexDeficien= (ods7.tasaDeficien - min(ods7.tasaDeficien, na.rm = T)) /
+               (max(ods7.tasaDeficien, na.rm = T)- min(ods7.tasaDeficien, na.rm = T))) |> 
+    select(1:2,13,15)
+
+e <- ods7.EstViv |> 
+    mutate(ods7.IndexViej= (tasaViej - min(tasaViej, na.rm = T)) /
+               (max(tasaViej, na.rm = T)- min(tasaViej, na.rm = T))) |> 
+    select(1:2,14,15)
+
+b <- ods7.EfEn |> select(6,1,2,3,4,5) |>
+    mutate(ods7.IndexLetraG= (ods7.tasaLetraG - min(ods7.tasaLetraG, na.rm = T)) /
+               (max(ods7.tasaLetraG, na.rm = T)- min(ods7.tasaLetraG, na.rm = T)))
+
+c <- pobr |> 
+    mutate(ods1.IndPobrSev = (ods1.PobrSev - min(ods1.PobrSev, na.rm = T)) /
+               (max(ods1.PobrSev, na.rm = T)- min(ods1.PobrSev, na.rm = T)))
+
+d <- pobr |> 
+    mutate(ods1.IndPobr = (ods1.Pobr - min(ods1.Pobr, na.rm = T)) /
+               (max(ods1.Pobr, na.rm = T)- min(ods1.Pobr, na.rm = T)))
+
+f <- consEnerMedio |> 
+    mutate(ods7.IndConsum = (ConsumoMedio - min(ConsumoMedio, na.rm = T)) /
+               (max(ConsumoMedio, na.rm = T)- min(ConsumoMedio, na.rm = T)))
+
+inPobrEn <- c[ , c(1,5)] |> 
+    inner_join(d[ , c(1,5)], by= 'ine') |> 
+    inner_join(b[, c(1,7)], by= 'ine') |> 
+    inner_join(f[, c(1,4)], by= 'ine') |>
+    inner_join(a[ , c(1,4)], by= 'ine') |> 
+    inner_join(e[ , c(1,4)], by= 'ine')
+
+M <- cor(inPobrEn[, 2:7], use = "complete.obs")
+col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
+colnames(M) <- c("Pobreza severa","Riesgo Pobreza","Inef.Energetica","Consumo Medio",
+                 "Estr.Deficiente","Estr.Vieja")
+rownames(M) <- c("Pobreza severa","Riesgo Pobreza","Inef.Energetica","Consumo Medio",
+                 "Estr.Deficiente","Estr.Vieja")
+corrplot::corrplot(M, method = 'color', col = col(200),
+                   type = 'upper',
+                   addCoef.col = 'black', diag= FALSE)
+
+# CORRELATTION COFFICIENTS
+#Correlation 	Negative 	Positive
+#None 		-0.09 to 0.00 	0.00 to 0.09
+#Small 		-0.30 to -0.10 	0.10 to 0.30
+#Medium 	-0.50 to -0.30 	0.30 to 0.50
+#Large 		-1.00 to -0.50 	0.50 to 1.00
+
+
+```
+
+Las tasas de Pobreza están inversamente correladas con la ancianidad de los edificios (anteriores de 1961), al mismo tiempo existe poca o nula correlación con las tasas de deficiencias estructurales de los edificios (la razón de este hecho no está clara, tener en cuenta de todos modos que se trata de datos antiguos), mientras **existe correlación moderada** con el **Índice de aislamiento deficiente de los edificios** (letra G) y una correlación muy baja con el **Consumo Medio Energético**. Por otros estudio sabemos que entre la baja eficiencia energética de los edificios y el sistema de calefacción de los edificios (bombona de gas, estufas eléctricas, calefacción general, etc.) existe una correlación bastante importante [Lise Desvalles, 2021](https://shs.hal.science/halshs-03185072/file/Scripta%20Nova%20.pdf). 
+
+
+```{r}
+
+
+# Obtención de datos de edificios con carencias de calefacción en ciudades españolas de >50.000 hab.
+DatosCalef <- readxl::read_xlsx("DatosCalefaccion_56800.xlsx",
+                  skip = 6) |> 
+    slice(-c(1:2)) |> 
+    rename(Municipio= ...1) |> 
+    select(1,2,5,6) |> 
+    mutate(across(2:4, as.integer)) |> 
+    mutate(CarenciaCalef= `No tiene calefacción`+
+               `No tiene instalación de calefacción pero sí algún aparato que permite calentar alguna habitación (por ejemplo radiadores eléctricos)`) |> 
+    select(1,5,4) |> 
+    mutate(tasCarCalef = round((CarenciaCalef)/Total*100,1))
+
+munClean <- readxl::read_xlsx("munClean.xlsx")
+
+DatosCalefClean <- DatosCalef |> 
+    mutate(Municipio= tolower(Municipio),
+           Municipio= stringi::stri_trans_general(Municipio, "Latin-ASCII"),
+           Municipio= sub("^l'(.*)", "\\1 l'", Municipio),
+           Municipio= gsub("'", "", Municipio),
+           Municipio= gsub("`", "", Municipio),
+           Municipio= gsub("´","", Municipio),
+           Municipio= gsub(",", "", Municipio),
+           Municipio= gsub("\\(", "", Municipio),
+           Municipio= gsub(")", "", Municipio),
+           Municipio= sub("^la (.*)", "\\1 la", Municipio),
+           Municipio= sub("^el (.*)", "\\1 el", Municipio),
+           Municipio= sub("^les (.*)", "\\1 les", Municipio),
+           Municipio= sub("^los (.*)", "\\1 los", Municipio),
+           Municipio= trimws(Municipio, "both"))
+
+
+indexCarCal <-DatosCalefClean |> 
+    left_join(munClean) |> 
+    select(5,1:4) |> 
+    filter(!is.na(ine)) |> 
+    mutate(indCarCal= (tasCarCalef - min(tasCarCalef, na.rm = T)) /
+               (max(tasCarCalef, na.rm = T)- min(tasCarCalef, na.rm = T)))
+
+inTot <- inPobrEn |> inner_join(indexCarCal[, c(1,6)], by= 'ine')
+
+corPobSCarCal <- cor(inTot$ods1.IndPobr, inTot$indCarCal)
+corRPobCarCal <- cor(inTot$ods1.IndPobrSev, inTot$indCarCal)
+
+
+```
+
+
+Los datos sobre falta de sistema de calefacción que surgen de la *Encuesta de Características Esenciales de la Población y las Viviendas* de 2021 podrían utilizarse. Existe una correlación bastante importante de dicho índice con el de Pobreza Severa (`r round(corRPobCarCal,2)`) y el de Riesgo de Pobreza (`r round(corPobSCarCal,2)`). Sin embargo, dichos datos, además de ser quizás demasiado correlados, sólo están disponibles para ciudades de más de 50.000 habitantes, esto es, solo 15 ciudades valencianas. Con lo cual el único indicador válido disponible (por tener correlación suficiente y por tener detalle municipal) en nuestro trabajo para acompañar los indicadores de pobreza es el de **Ineficiencia energética de los edificios** que preferimos respecto al consumo medio de los edificios por una correlación moderada con la pobreza, y no excesiva (que entonces significaría redundancia).
+
+Por lo tanto proponemos construir, en vía experimental, un indice categórico, de Riesgo de Vulnerabilidad Energética, basado en el nivel de los dos índices: 1) Indice de pobreza extrema; 2) Índice Ineficiencia energética o Índice de edificios con aislamiento deficiente (letra G). Podemos determinar 4 niveles por cada uno de los índices
+
+
+```{r}
+library(flextable)
+#	1	        2
+#1	Muy alto	Alto
+#2	Alto	    Medio
+#3	Medio	    Bajo
+#4	Bajo	    Bajo
+
+data.frame(AltoNivelG= c("Muy alto", "Alto", "Medio", "Bajo"),
+           M.AltoNivelG= c("Alto","Medio","Medio","Bajo"),
+           M.BajoNivelG= c("Medio","Medio","Bajo","Bajo"),
+           BajoNivelG= c("Medio", "Bajo", "Bajo", "Bajo"),
+           row.names = c("Pobreza severa - Nivel alto",
+                         "Pobreza severa - Nivel medio-alto",
+                         "Pobreza severa - Nivel medio-bajo",
+                         "Pobreza severa - Nivel bajo")) |> 
+    add_rownames() |> 
+    flextable() |> 
+    width(width = 2) |> 
+    set_header_labels(rowname= 'Nivel de pobreza severa', AltoNivelG= 'Alto índice de ineficiencia enrgética',M.AltoNivelG= "Medio-alto índice de ineficiencia energética",M.BajoNivelG= "Medio-bajo índice de ineficiencia energética", BajoNivelG= 'Bajo índice de ineficiencia enrgética') |> 
+    set_caption('Niveles de riesgo de Vulnerabilidad Energética en función de los indices de Pobreza Sevea y de Ineficiencia energética')
+
+
+```
+
+
+
+
+
