@@ -1,0 +1,291 @@
+---
+title: "Extracción datos de Cooperación de la FEMP"
+author: "Stefano Sanfilippo"
+date: "2024-02-29"
+output: html_document
+---
+
+
+```{r}
+
+library(rvest)
+library(dplyr)
+library(stringr)
+library(tidyr)
+library(RSelenium)
+library(wdman)
+library(netstat)
+library(httr)
+
+
+```
+
+```{r}
+# Base de datos de Cooperación FEMP
+
+# Connect to Selenium via Firefox
+driver_object <- rsDriver(browser = "firefox",
+                   chromever=NULL,
+                   verbose = FALSE,
+                   port = free_port())
+
+remDr <- driver_object$client
+# OBRIR
+remDr$open()
+```
+
+
+```{r}
+# COOPERACIÓN FEMP
+
+url <- 'http://cooperacion.femp.es/'
+remDr$navigate(url)
+
+```
+
+
+
+```{r}
+# Dropdown AÑO
+
+xpath_dropdown23 <-
+'//html/body/div/div[3]/div/div[1]/div[2]/form/div[1]/div[1]/div[2]/select/option[20]'
+xpath_dropdown22 <-
+'/html/body/div/div[3]/div/div[1]/div/div[2]/form/div[1]/div[1]/div[2]/select/option[19]'
+xpath_dropdown21 <-
+'/html/body/div/div[3]/div/div[1]/div[2]/form/div[1]/div[1]/div[2]/select/option[18]'
+
+opt_anyo <- remDr$findElement(using = 'xpath', xpath_dropdown21)
+opt_anyo$clickElement()
+Sys.sleep(2)
+
+# Dropdown TIPO DE ENTIDAD
+css_ay <- '#tipoentidade > option:nth-child(2)'
+
+ayuntamientos <- remDr$findElement(using = 'css selector', css_ay)
+ayuntamientos$clickElement()
+Sys.sleep(2)
+
+# Dropdown CCAA
+
+xpath_dropdown_cva <- 
+    '/html/body/div/div[3]/div/div[1]/div/div[2]/form/div[2]/div[1]/div[2]/div/select/option[11]'
+cva <- remDr$findElement(using = 'xpath', xpath_dropdown_cva)
+cva$clickElement()
+Sys.sleep(2)
+
+
+# Botón BUSCAR
+
+xpath_busca <- '//*[@id="submite"]'
+
+busca <- remDr$findElement(using = 'xpath', xpath_busca)
+busca$clickElement()
+Sys.sleep(2)
+
+
+```
+
+
+```{r}
+
+# Listado entidades: numero de reiteraciones a realizar en funció del año seleccionado
+
+num_entidades <- remDr$getPageSource()[[1]] %>% 
+    read_html() %>%
+    html_nodes("#entidades > table > tbody > tr > td") %>% #nodo al pie de página 
+    html_text(trim = TRUE) %>% 
+    str_extract_all(., "\\d+")
+
+num_entidades <- as.numeric(num_entidades) # Es el num. que hay usar en for loop
+
+# FICHAS
+# Selector entidad a iterar en el forloop
+xpath_ay <- paste0('/html/body/div/div[2]/div/div/div[',4:(num_entidades+3),']/a[1]')
+
+# Selector "Datos cooperación"
+coop_xpath <- '/html/body/div/div[2]/div/div/div/ul/li[2]/a'
+
+# CSS Selectores para entrar en las fichas de diferentes años
+css_2021 <- '#anos > a:nth-child(4)' # 2021 
+css_2022 <- '#anos > a:nth-child(5)' # 2022
+css_2023 <- '#anos > p.selected'     # 2023: como es selected, es opcional
+
+# XPATH para entrar en las fichas de diferentes años
+xpath_2020 <- '//*[@id="anos"]/p[2]'
+xpath_2021 <- '//*[@id="anos"]/p[3]'
+xpath_2022 <- '//*[@id="anos"]/p[4]'
+xpath_2023 <- '//*[@id="anos"]/p[5]'
+
+# Selector botón "Volver"
+volver_xpath <- '/html/body/div/div[2]/div/div/a'
+
+# Lista de comienzo de loop
+lista <- list()
+entidad <- list()
+i  <- 1
+
+
+```
+
+
+```{r}
+
+for (i in c(1:3,6:8,num_entidades)) {
+
+ay1 <-remDr$findElement(using = 'xpath', xpath_ay[[i]]) # Ver ficha
+ay1$clickElement()
+Sys.sleep(1)
+
+coop <-remDr$findElement(using = 'xpath', coop_xpath) # Ver datos cooperacion
+coop$clickElement()
+Sys.sleep(1)
+
+
+anno <- remDr$findElement(using = 'link text', value =  '2021') # Ver año
+anno$clickElement()
+Sys.sleep(1)
+
+
+lista[[i]] <- remDr$getPageSource()[[1]] %>% 
+    read_html() %>%
+    html_nodes('.columnadatos') |>
+    html_text(trim = TRUE) |> 
+    str_squish() |> 
+    str_split("€") |> 
+    unlist() |> 
+    str_squish()
+
+entidad[[i]] <- remDr$getPageSource()[[1]] %>% 
+    read_html() %>%
+    html_nodes("#entidades > h2") %>% 
+    html_text(trim = TRUE)
+
+volv <- remDr$findElement(using = 'xpath', volver_xpath) # Botón volver
+volv$clickElement()
+Sys.sleep(1)
+
+}
+```
+
+
+```{r}
+a <- unlist(lista) %>% as.data.frame() %>% 
+    filter(grepl("Total comprometido", .)) %>%
+    filter(!grepl("Total comprometido \\(", .)) %>% 
+    mutate(importe= str_sub(., 20, 100),
+           importe= gsub("\\.","",importe),
+           importe= gsub(",","\\.",importe),
+           importe= as.numeric(importe))
+
+entidad <- unlist(entidad) %>% as.data.frame()
+
+b <- cbind(entidad,a)
+
+names(b) <- c("Municipio", "Concepto", "Importe")
+
+coop.municipios <- 
+    b %>% 
+    mutate(Concepto= str_sub(Concepto, 1,18))
+
+```
+
+
+
+```{r}
+
+# RESTO DE MUNICIPIOS
+
+entidadb <- list()
+listab <- list()
+j <- 1
+fora <- c(4,5,9,10)
+for (j in fora) {
+
+ay1 <-remDr$findElement(using = 'xpath', xpath_ay[[j]]) # Ver ficha
+ay1$clickElement()
+Sys.sleep(1)
+
+coop <-remDr$findElement(using = 'xpath', coop_xpath) # Ver datos cooperacion
+coop$clickElement()
+Sys.sleep(1)
+
+#anno <- remDr$findElement(using = 'link text', value =  '2021') # Ver año
+#anno$clickElement()
+#Sys.sleep(1)
+
+
+listab[[j]] <- remDr$getPageSource()[[1]] %>% 
+    read_html() %>%
+    html_nodes('.columnadatos') |>
+    html_text(trim = TRUE) |> 
+    str_squish() |> 
+    str_split("€") |> 
+    unlist() |> 
+    str_squish()
+
+entidadb[[j]] <- remDr$getPageSource()[[1]] %>% 
+    read_html() %>%
+    html_nodes("#entidades > h2") %>% 
+    html_text(trim = TRUE)
+
+volv <- remDr$findElement(using = 'xpath', volver_xpath) # Botón volver
+volv$clickElement()
+Sys.sleep(1)
+
+}
+
+
+```
+
+
+```{r}
+
+# RESTO DE MUNICIPIOS
+
+
+x <- unlist(listab) %>% as.data.frame() %>% 
+    filter(grepl("Total comprometido", .)) %>%
+    filter(!grepl("Total comprometido \\(", .)) %>% 
+    mutate(importe= str_sub(., 20, 100),
+           importe= gsub("\\.","",importe),
+           importe= gsub(",","\\.",importe),
+           importe= as.numeric(importe))
+# Añadir línea
+names(x) <- c("Concepto", "Importe")
+x[nrow(x)+1,] <- c(NA,NA)
+
+entidadb <- unlist(entidadb) %>% as.data.frame()
+
+y <- cbind(entidadb,x)
+
+names(y) <- c("Municipio", "Concepto", "Importe")
+
+coop.municipiosb <- 
+    y %>% 
+    mutate(Concepto= str_sub(Concepto, 1,18))
+
+
+```
+
+```{r}
+
+coop.municip.2021 <- rbind(coop.municipios,coop.municipiosb)
+
+writexl::write_xlsx(coop.municip.2021, "coop.municipios2021.xlsx")
+```
+
+
+
+
+```{r}
+writexl::write_xlsx(coop.municipios, "coop.municipios.xlsx")
+```
+
+
+```{r}
+# CERRAR
+remDr$close()
+remDr$closeServer()
+```
+

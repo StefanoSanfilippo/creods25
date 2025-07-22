@@ -1,0 +1,141 @@
+---
+title: "Extracción datos ciudades educadoras"
+author: "Stefano Sanfilippo"
+date: "2024-02-29"
+output: html_document
+---
+
+
+```{r}
+
+library(rvest)
+library(dplyr)
+library(stringr)
+library(tidyr)
+library(RSelenium)
+library(wdman)
+library(netstat)
+library(httr)
+
+
+```
+
+
+```{r}
+
+
+# Asociaciones valencianas miembros de la Asociación Internacional de Ciudades Educadoras (AICE)
+
+# Connect to Selenium via Firefox
+driver_object <- rsDriver(browser = "firefox",
+                   chromever=NULL,
+                   verbose = FALSE,
+                   port = free_port())
+
+remDr <- driver_object$client
+# OBRIR
+remDr$open()
+
+
+# RED CIUDADES EDUCADORAS
+
+url <- 'https://www.edcities.org/listado-de-las-ciudades-asociadas/'
+remDr$navigate(url)
+
+# Dropdown CONTINENTES
+
+
+xpath_dropdown <- '/html/body/div[1]/div[2]/div[1]/div/ul/li[1]/select/option[5]'
+
+opt_europa <- remDr$findElement(using = 'xpath', xpath_dropdown)
+opt_europa$clickElement()
+
+# Dropdown PAÍSES
+
+xpath_dropdown_es <- '/html/body/div[1]/div[2]/div[1]/div/ul/li[2]/select/option[5]'
+
+espanya <- remDr$findElement(using = 'xpath', xpath_dropdown_es)
+espanya$clickElement()
+
+# A partir de aquí tenemos el listado
+ciudades <- remDr$getPageSource()[[1]] %>% 
+    read_html() %>%
+    html_nodes('.ciudad-asociada') |> 
+    html_text(trim = TRUE) |> 
+    str_split(", ")
+
+ciudades <- unlist(ciudades)
+
+
+
+ciudades <- ciudades |> 
+    tolower() |> 
+    stringi::stri_trans_general("Latin-ASCII")
+
+
+ciudades <- sub("^l'(.*)", "\\1 l'", ciudades)
+ciudades <- sub("^l'(.*)", "\\1 l'", ciudades)
+ciudades <- gsub("'", "", ciudades) 
+ciudades <- gsub("`", "", ciudades)
+ciudades <- gsub("´","", ciudades)
+ciudades <- gsub(",", ";", ciudades)
+ciudades <- gsub("\\(", "", ciudades)
+ciudades <- gsub(")", "", ciudades)
+ciudades <- sub("^la (.*)", "\\1 la", ciudades)
+ciudades <- sub("^el (.*)", "\\1 el", ciudades)
+ciudades <- sub("^les (.*)", "\\1 les", ciudades)
+ciudades <- sub("^los (.*)", "\\1 los", ciudades)
+ciudades <- trimws(ciudades, "both")
+
+
+
+
+url2 <- "https://bdt.gva.es/bdt/res_optimo_static.php?cons=C1V4873&idioma=cas&form=xlsx"
+
+GET(url2, write_disk(tf2 <- tempfile(fileext = ".xlsx")))
+
+municipios <- readxl::read_xlsx(tf2,
+                  skip = 7) |> 
+    select(1) |> 
+    filter(grepl("^03|^12|46", ...1)) |> 
+    rename(Municipio= ...1) |> 
+    mutate(ine= str_sub(Municipio, 1,5),
+           Municipio= str_sub(Municipio, 9,100)) |> 
+    select(2, 1) |> 
+    filter(ine != "12066")
+
+
+mun_bar <- municipios |> 
+    # filter(grepl("/", Municipio)) |> 
+    mutate(mun1= str_sub(str_extract(Municipio, "(.*?)\\/"), end= -2),
+           mun2= str_sub(str_extract(Municipio, "/.*"), start= 2)) |> 
+    pivot_longer(cols = c(2,3,4)) |> 
+    rename(Municipio= value) |> 
+    mutate(Municipio= tolower(Municipio),
+           Municipio= stringi::stri_trans_general(Municipio, "Latin-ASCII"),
+           Municipio= sub("^l'(.*)", "\\1 l'", Municipio),
+           Municipio= gsub("'", "", Municipio),
+           Municipio= gsub("`", "", Municipio),
+           Municipio= gsub("´","", Municipio),
+           Municipio= gsub(",", "", Municipio),
+           Municipio= gsub("\\(", "", Municipio),
+           Municipio= gsub(")", "", Municipio),
+           Municipio= trimws(Municipio, "both"))
+
+CiudadesEducadoras <- as.data.frame(ciudades) |> 
+    left_join(mun_bar, by= c('ciudades'='Municipio')) |> 
+    filter(!is.na(ine)) |> 
+    distinct(ine, .keep_all = TRUE) |> 
+    select(2,1) |> 
+    inner_join(municipios, by= 'ine') |> 
+     select(-2)
+
+writexl::write_xlsx(CiudadesEducadoras, "CiudadesEducadoras.xlsx")
+
+
+
+
+```
+
+
+
